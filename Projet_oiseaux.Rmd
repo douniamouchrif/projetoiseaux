@@ -1,0 +1,29 @@
+---
+title: "Projet"
+output: 
+  html_document:
+    code_folding: hide
+    code_download: true
+    theme: united
+    highlight: tango
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+date: "`r format(Sys.Date(), '%d %B, %Y')`"
+author:
+   - name: 
+     affiliation: "Université de Bordeaux - CMI ISI M1 - UE : Projet de statistique pour données environnementales 2024"
+---
+title: "Projet oiseaux"
+output: html_document
+date: "2024-02-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+

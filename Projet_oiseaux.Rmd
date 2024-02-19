@@ -14,7 +14,7 @@ output:
       smooth_scroll: false
 date: "`r format(Sys.Date(), '%d %B, %Y')`"
 author:
-   - name: 
+   - name: ""
      affiliation: "Université de Bordeaux - CMI ISI M1 - UE : Projet de statistique pour données environnementales 2024"
 ---
 title: "Projet oiseaux"
@@ -25,5 +25,14 @@ date: "2024-02-19"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+```{r}
+Sites <- read.csv("Data/BiodiverCite_sites.csv", header = TRUE, sep = ";")
+Land_cartoISea <- read.csv("Data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
+Oiseaux <- read.csv("Data/Oiseaux_up_to_2023.csv", header = TRUE)
+```
+
+
+
 
 

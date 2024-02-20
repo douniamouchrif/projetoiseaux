@@ -49,4 +49,14 @@ Oiseaux$Nom_Latin <- sapply(strsplit(Oiseaux$Nom_Taxon_Cite, "\\|"), function(x)
 print(Oiseaux)
 ```
 
+```{r}
+donnees_agregate <- aggregate(Denombrement_min ~ Temperature, data = Oiseaux, FUN = sum)
+
+# Tracer le graphique
+plot(donnees_agregate$Temperature, donnees_agregate$Denombrement_min, type = "b", 
+     xlab = "Température (°C)", ylab = "Nombre d'oiseaux",
+     main = "Nombre d'oiseaux par température",
+     col = "blue", pch = 19)
+
+```
 

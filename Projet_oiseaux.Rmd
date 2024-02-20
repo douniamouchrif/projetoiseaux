@@ -30,7 +30,6 @@ knitr::opts_chunk$set(echo = TRUE)
 Sites <- read.csv("Data/BiodiverCite_sites.csv", header = TRUE, sep = ";")
 Land_cartoISea <- read.csv("Data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 Oiseaux <- read.csv("Data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
-Mos<-read.table(file='themes_mos_gir.txt',header=TRUE,sep = "") 
 ```
 
 ```{r}
@@ -45,5 +44,9 @@ head(Land_cartoISea)
 head(Oiseaux)
 ```
 
+```{r}
+Oiseaux$Nom_Latin <- sapply(strsplit(Oiseaux$Nom_Taxon_Cite, "\\|"), function(x) trimws(x[1]))
+print(Oiseaux)
+```
 
 

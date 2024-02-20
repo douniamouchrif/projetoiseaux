@@ -46,6 +46,7 @@ head(Oiseaux)
 
 ```{r}
 Oiseaux$Nom_Latin <- sapply(strsplit(Oiseaux$Nom_Taxon_Cite, "\\|"), function(x) trimws(x[1]))
+Oiseaux$Year <- sapply(strsplit(Oiseaux$Date, "\\-"), function(x) trimws(x[1]))
 print(Oiseaux)
 ```
 

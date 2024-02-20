@@ -32,7 +32,17 @@ Land_cartoISea <- read.csv("Data/LandUsePer_BM_2023_cartoISea.csv", header = TRU
 Oiseaux <- read.csv("Data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
 ```
 
+```{r}
+head(Sites)
+```
 
+```{r}
+head(Land_cartoISea)
+```
+
+```{r}
+head(Oiseaux)
+```
 
 
 

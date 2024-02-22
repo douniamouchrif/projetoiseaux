@@ -117,7 +117,8 @@ ggplot(result, aes(x = Temperature, y = Total, fill = Nom_Latin)) +
        fill = "Nom Latin") +
   theme_minimal()
 ```
-
+"Le moineau domestique est un oiseau sédentaire. Cela signifie qu'il ne migre pas et vit toujours au même endroit. C'est donc un des rares oiseaux que tu peux encore observer en automne et en hiver."
+C'est pourquoi le "Passer domesticus" est présent tout le long de l'année en grand nombre.
 
 ###MATHILDE
 ```{r}

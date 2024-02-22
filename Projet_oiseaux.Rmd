@@ -51,6 +51,11 @@ print(Oiseaux)
 ```
 
 ```{r}
+#nombre d'oiseaux au total
+Oiseaux_Tot <- sum(Oiseaux$Denombrement_min)
+```
+
+```{r}
 donnees_agregate <- aggregate(Denombrement_min ~ Temperature, data = Oiseaux, FUN = sum)
 
 # Tracer le graphique
@@ -90,11 +95,11 @@ plot(join_data$MOS11, join_data$Denombrement_min,
 
 
 ###SUHAILA
+## codes pages 128/129 mais jsp
 ```{r}
-
 freq <- table(Oiseaux$Nom_Latin)
 
-# codes pages 128/129
+
 library(ggplot2)
 X <- runif(100)
 # La moyenne n'est pas définie à r=0, décalage de 10^-8
@@ -104,6 +109,23 @@ df <- data.frame(freq, Moyenne = sapply(freq, function(freq) (mean(X^freq))^(1/f
 ggplot(df, aes(x = freq, y = Moyenne)) +
   geom_line()
 ```
+
+## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par température
+```{r}
+result <- Oiseaux %>%
+  group_by(Temperature, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total)) 
+
+ggplot(result, aes(x = Temperature, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente par température",
+       x = "Température (°C)",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+```
+
 
 ###MATHILDE
 ```{r}

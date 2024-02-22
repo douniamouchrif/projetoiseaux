@@ -89,3 +89,30 @@ countryPolygons.df
 leaflet(data = Land_cartoISea) %>% addTiles() %>%
   addMarkers(~countryPolygons.df$coords.x1, ~countryPolygons.df$coords.x2, )
 ```
+
+
+###DOUNIA
+```{r}
+
+
+```
+
+
+###SUHAILA
+```{r}
+
+
+```
+
+###MATHILDE
+```{r}
+
+
+```
+
+###KARINA
+```{r}
+
+
+```
+

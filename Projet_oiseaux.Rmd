@@ -125,8 +125,34 @@ plot(join_data$MOS11, join_data$Denombrement_min,
 ```
 
 ###KARINA
+# Carte points 
 ```{r}
+lambert_data <- data.frame(X = Land_cartoISea$X, Y = Land_cartoISea$Y)
+coordinates(lambert_data) <- c("X", "Y")
 
+proj4string(lambert_data) <- CRS("+proj=lcc +lat_1=48 +lat_2=44 +lat_0=46.5 +lon_0=3 +x_0=700000 +y_0=6600000 +ellps=GRS80 +units=m +no_defs")
 
+wgs84 <- CRS("+proj=longlat +datum=WGS84")
+
+lambert_to_wgs84 <- spTransform(lambert_data, wgs84)
+
+countryPolygons.df <- as.data.frame(lambert_to_wgs84)
+```
+
+```{r}
+colnames(countryPolygons.df)[colnames(countryPolygons.df) == "coords.x1"] <- "X"
+colnames(countryPolygons.df)[colnames(countryPolygons.df) == "coords.x2"] <- "Y"
+Land_cartoISea <- select(Land_cartoISea, -X, -Y)
+Land_cartoISea <- cbind(Land_cartoISea, countryPolygons.df)
+Land_cartoISea_500 <- subset(Land_cartoISea, BufferSize == 500)
+```
+
+```{r}
+palette <- colorNumeric(palette = "viridis", domain = Land_cartoISea_500$MOS1)
+palette
+
+leaflet(data = Land_cartoISea_500) %>% 
+  addTiles() %>%
+  addCircles(~X, ~Y, weight = 1, radius = ~BufferSize, color = ~palette(MOS1), opacity = 1, fillOpacity = 0.5)
 ```
 

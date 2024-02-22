@@ -120,6 +120,38 @@ ggplot(result, aes(x = Temperature, y = Total, fill = Nom_Latin)) +
 "Le moineau domestique est un oiseau sédentaire. Cela signifie qu'il ne migre pas et vit toujours au même endroit. C'est donc un des rares oiseaux que tu peux encore observer en automne et en hiver."
 C'est pourquoi le "Passer domesticus" est présent tout le long de l'année en grand nombre.
 
+## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par intensité du vent
+```{r}
+result2 <- Oiseaux %>%
+  group_by(Vent, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total)) 
+
+ggplot(result2, aes(x = Vent, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente par intensité du vent",
+       x = "Intensité du vent",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+```
+
+## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par couverture nuageuse
+```{r}
+result3 <- Oiseaux %>%
+  group_by(Couvert_Nuageux, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total)) 
+
+ggplot(result3, aes(x = Couvert_Nuageux, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente par couverture nuageuse",
+       x = "Couverture nuageuse",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+```
+
 ###MATHILDE
 ```{r}
 

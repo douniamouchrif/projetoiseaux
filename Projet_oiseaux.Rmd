@@ -115,7 +115,17 @@ plot(join_data$MOS11, join_data$Denombrement_min,
 ###SUHAILA
 ```{r}
 
+freq <- table(Oiseaux$Nom_Latin)
 
+# codes pages 128/129
+library(ggplot2)
+X <- runif(100)
+# La moyenne n'est pas définie à r=0, décalage de 10^-8
+r <- seq(-5, 10, .1) + 1E-8
+# Préparation des données
+df <- data.frame(freq, Moyenne = sapply(freq, function(freq) (mean(X^freq))^(1/freq))) 
+ggplot(df, aes(x = freq, y = Moyenne)) +
+  geom_line()
 ```
 
 ###MATHILDE

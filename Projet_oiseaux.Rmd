@@ -75,22 +75,14 @@ library(leaflet)
 
 ###DOUNIA
 ```{r}
-join_data <- base::merge(Oiseaux,
-                            Land_cartoISea,
-                            by.x = "Code_Maille",
-                            by.y = "ID",
-                            all.x = TRUE)
-head(join_data)
-unique(join_data$Nom_Latin)
+#on commence avec un buffer size à 500
+Land_cartoISea_500 <- Land_cartoISea%>% filter(BufferSize == 500)
+data_join <- Oiseaux %>% left_join(y = Land_cartoISea_500, 
+                                  by = c("Code_Maille" = "ID"))
 
-donnees_agregate2 <- aggregate(Denombrement_min ~ Nom_Latin, data = join_data, FUN = sum)
-donnees_agregate2
+donnees_agregate2 <- aggregate(data_join$Denombrement_min, by = list(MOS11 = data_join$MOS11,Year = data_join$Year), FUN = sum)
 
-
-plot(join_data$MOS11, join_data$Denombrement_min, 
-     xlab = "Surfaces artificialisées en % MOS11", ylab = "Nombre d'oiseaux",
-     main = "Oiseaux",
-     col = join_data$Year, pch = 19)
+qplot(x = donnees_agregate2$MOS11, y = donnees_agregate2$x, data = donnees_agregate2, color = Year, geom = "line", xlab = "Surfaces artificialisées en % (MOS11)", ylab = "Nombre d'oiseaux", main = "Nombre d'oiseaux en fonction du pourcentage d'artificialisation")
 ```
 
 

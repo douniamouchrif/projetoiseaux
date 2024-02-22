@@ -93,8 +93,22 @@ leaflet(data = Land_cartoISea) %>% addTiles() %>%
 
 ###DOUNIA
 ```{r}
+join_data <- base::merge(Oiseaux,
+                            Land_cartoISea,
+                            by.x = "Code_Maille",
+                            by.y = "ID",
+                            all.x = TRUE)
+head(join_data)
+unique(join_data$Nom_Latin)
+
+donnees_agregate2 <- aggregate(Denombrement_min ~ Nom_Latin, data = join_data, FUN = sum)
+donnees_agregate2
 
 
+plot(join_data$MOS11, join_data$Denombrement_min, 
+     xlab = "Surfaces artificialisées en % MOS11", ylab = "Nombre d'oiseaux",
+     main = "Oiseaux",
+     col = join_data$Year, pch = 19)
 ```
 
 

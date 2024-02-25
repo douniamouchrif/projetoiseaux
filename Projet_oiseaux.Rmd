@@ -180,8 +180,7 @@ ggplot(result3, aes(x = Couvert_Nuageux, y = Total, fill = Nom_Latin)) +
 ```
 
 ###KARINA
-###KARINA
-# Carte points 
+## Carte points 
 ```{r}
 lambert_data <- data.frame(X = Land_cartoISea$X, Y = Land_cartoISea$Y)
 coordinates(lambert_data) <- c("X", "Y")

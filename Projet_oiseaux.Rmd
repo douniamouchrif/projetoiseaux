@@ -211,18 +211,12 @@ leaflet(data = Land_cartoISea_500) %>%
   addCircles(~X, ~Y, weight = 1, radius = ~BufferSize, color = ~palette(MOS1), opacity = 1, fillOpacity = 0.5, popup = ~name_site)
 ```
 
-
 ```{r}
 table_jointe_tbl <- Sites %>% 
                         left_join(y = Land_cartoISea_500, 
                                   by = c("code_site" = "ID"))
 table_jointe_tbl
 ```
-
-```{r}
-table_jointe_tbl
-```
-
 
 ```{r}
 palette <- colorNumeric(palette = "viridis", domain = table_jointe_tbl$MOS11)

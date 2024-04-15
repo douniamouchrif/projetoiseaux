@@ -86,9 +86,12 @@ tot_Milieu_favori
 Oiseaux_Tot <- sum(Oiseaux$Denombrement_min)
 ```
 
+## Formules de diversité
+
 i <- espece
 j <- site
 
+### Formule 1
 ```{r}
 oiseaux_par_site = table(Oiseaux$Code_Maille)
 
@@ -98,7 +101,7 @@ p_ij <- x_ij$x / ave(x_ij$x, x_ij$Code_Maille, FUN = sum)
 p_ij
 ```
 
-Formule 2
+### Formule 2
 H_j = entropie (somme par site)
 ```{r}
 H_j <- numeric(length(unique(x_ij$Code_Maille)))
@@ -111,7 +114,8 @@ D_2 = exp(H_j)
 D_2
 ```
 
-Formule 3
+### Formule 3
+
 1 divisé par la proba que deux individus qu'on prend dans un ehcantillon soient de la meme espece, donc plus la proba augmente, plus D_3 va diminuer car la proba est au dénominateur
 
 ```{r}
@@ -123,6 +127,15 @@ for (j in 1:length(unique(x_ij$Code_Maille))) {
 }
 D_3
 ```
+
+## Tests
+```{r}
+#avec 2/3 espèces faire les calcul et voir si on trouve bien les bons trucs
+test <- Oiseaux$Denombrement_min[Oiseaux$Nom_Latin == 'Erithacus rubecula']
+test
+```
+
+
 
 Graph "Nombre d'oiseaux par température"
 ```{r}

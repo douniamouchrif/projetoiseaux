@@ -22,6 +22,13 @@ output: html_document
 date: "2024-02-19"
 ---
 
+```{r}
+library(dplyr)
+library(sp)
+library(leaflet)
+library(ggplot2)
+```
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -65,9 +72,23 @@ print(Oiseaux)
 names(Traits)[4] = "Milieu_favori"
 ```
 
+```{r}
+# Nombre total pour chaque modalité Milieu_favori
+tot_Milieu_favori <- Traits %>%
+  group_by(Milieu_favori) %>%
+  summarise(Total = n())
+
+tot_Milieu_favori
+```
 
 ```{r}
-#nombre d'oiseaux au total
+# Join tables Oiseaux et Traits
+data_join <- Oiseaux %>% left_join(y = Traits, 
+                                  by = c("Nom_Latin" = "Nom.latin"))
+```
+
+```{r}
+# Nombre d'oiseaux au total
 Oiseaux_Tot <- sum(Oiseaux$Denombrement_min)
 ```
 
@@ -82,13 +103,6 @@ plot(donnees_agregate$Temperature, donnees_agregate$Denombrement_min, type = "b"
 
 ```
 
-
-```{r}
-library(dplyr)
-library(sp)
-library(leaflet)
-library(ggplot2)
-```
 
 ```{r}
 #on commence avec un buffer size à 500

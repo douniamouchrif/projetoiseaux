@@ -30,6 +30,7 @@ library(sp)
 library(leaflet)
 library(ggplot2)
 library(lubridate)
+library(FactoMineR)
 ```
 
 ```{r}
@@ -96,7 +97,7 @@ table_jointe_tbl <- Sites %>%
 ```
 
 ```{r}
-palette <- colorNumeric(palette = "plasma",domain = table_jointe_tbl$MOS11)
+palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11)
 
 amp_artificial <- leaflet(data = table_jointe_tbl) %>% 
   addTiles() %>%
@@ -111,7 +112,7 @@ On peut déjà voir une corrélation au niveau de l'artificialisation. Les lieux
 
 ```{r}
 #on commence avec un buffer size à 500
-Land_cartoISea_500 <- Land_cartoISea %>% filter(BufferSize == 500)
+#Land_cartoISea_500 <- Land_cartoISea %>% filter(BufferSize == 500)
 
 ###on join les df Land_cartoISea_500 et Oiseaux 
 data_join <- Oiseaux %>% left_join(y = Land_cartoISea_500, by = c("Code_Maille" = "ID"))
@@ -165,6 +166,7 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation (année 2018)")
 
 ```
+ATTENTION À L'INTERPRÉTATION CAR LES ECHELLES NE SONT PAS LES MÊMES SUR L'AXE DES ABSCISSES
 En 2023 on observe une nouvelle fois un pic proche des 10% d'artificialisation et après une chute jusqu'au 60% d'artificialisation. Comment peut-on expliquer cette chute ?
 ```{r}
 # Filtre des données pour ne garder que l'année 2023
@@ -177,6 +179,7 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation (année 2018)")
 
 ```
+ATTENTION À L'INTERPRÉTATION CAR LES ECHELLES NE SONT PAS LES MÊMES SUR L'AXE DES ABSCISSES
 On voit que les tendances changent, surtout en 2023 avec un nombre d'espèce qui semble d'augmenter avec le pourcentage d'artificialisation. On a toujours le pic au niveau des 10% et ensuite, au lieu d'avoir un nombre d'espèce qui diminue considérablement, on a une courbe qui se maintient plutôt bien. Oon remarque même que cette dernière semble monter vers la fin, que peut-on en déduire ??
 
 On remarque que les tendances du nombre d'espcèes changent mais nous ne savons pas vraiment comment l'expliquer. Nous pouvons à présent supposer qu'une autre variable explicative doit pouvoir nous aider à les comprendre. Nous allons donc maintenant nous intéresser aux variables ambiantes :  la température, le vent et la couverture nuageuse pour essayer de comprendre les variations dans les nombres d'espèces. 
@@ -213,7 +216,7 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
   geom_point() +
   labs(x = "Température",
        y = "Nombre d'espèces",
-       title = "Nombre d'espèces différentes en fonction de la température (année 2018)")
+       title = "Nombre d'espèces différentes en fonction de la température (année 2019)")
 
 ```
 ```{r}
@@ -229,7 +232,7 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
   geom_point() +
   labs(x = "Température",
        y = "Nombre d'espèces",
-       title = "Nombre d'espèces différentes en fonction de la température (année 2018)")
+       title = "Nombre d'espèces différentes en fonction de la température (année 2022)")
 
 ```
 ```{r}
@@ -245,7 +248,7 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
   geom_point() +
   labs(x = "Température",
        y = "Nombre d'espèces",
-       title = "Nombre d'espèces différentes en fonction de la température (année 2018)")
+       title = "Nombre d'espèces différentes en fonction de la température (année 2023)")
 
 ```
 Maintenant on regarde le niveau du vent.
@@ -269,28 +272,127 @@ ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
        title = "Nombre d'espèces différentes en fonction du niveau de vent")
 
 ```
+Ici comme dans Couvert Nuageux les valeurs sont à la fois numériques et du texte, on a changé pour avoir des groupes, ainsi : 
+ - 1 : 25-50%
+ - 2 : 100%
+  - 3 : 50-75%
+  - 4 : 75-100%
+  - 5 : 0-25%
+```{r}
+data_join$Couvert_Nuageux <- gsub("100,00 %", "100%", data_join$Couvert_Nuageux)
+data_join$Couvert_Nuageux_factor <- as.numeric(as.factor(data_join$Couvert_Nuageux))
+data_join
+```
 
 Et finalement la couverture nuageuse.
 
 ```{r}
-# Supposons que votre dataframe s'appelle "data_join"
-
-# Convertir la colonne "Couvert_Nuageux" en facteur
-data_join$Couvert_Nuageux <- factor(data_join$Couvert_Nuageux, levels = c("0-25%", "25-50%", "50-75%", "75-100%","100,00%"))
-
 # Créer un résumé du nombre d'espèces par niveau de couverture nuageuse
 res_couverture_nuageuse <- data_join %>%
-  group_by(Couvert_Nuageux) %>%
+  group_by(Couvert_Nuageux_factor) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
 # Créer le graphique
-ggplot(data = res_couverture_nuageuse, aes(x = Couvert_Nuageux, y = Nb_espece)) +
+ggplot(data = res_couverture_nuageuse, aes(x = Couvert_Nuageux_factor, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Couverture Nuageuse",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la couverture nuageuse")
 
 ```
+
+On fait maintenant une ACP, on va essayer de voir si la variabilité du nombre d'espèces est expliqué par l'artificialisation ou si elle peut être expliquée par d'autres variables ambiantes.
+
+```{r}
+data_join$Vent_nombre <- as.numeric(gsub("\\D", "", data_join$Vent))
+data_join
+```
+```{r}
+variables <- data_join %>%
+  select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
+  na.omit()
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+
+
+
+```{r}
+variables <- data_join %>%
+  filter(Year == 2018) %>%
+  select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
+  na.omit()
+variables
+```
+
+```{r}
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
+```
+
+```{r}
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+
+```{r}
+variables <- data_join %>%
+  filter(Year == 2019) %>%
+  select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
+  na.omit()
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+```{r}
+variables <- data_join %>%
+  filter(Year == 2022) %>%
+  select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
+  na.omit()
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+```{r}
+variables <- data_join %>%
+  filter(Year == 2023) %>%
+  select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
+  na.omit()
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+
 
 ## Pour 1000m de rayon donc 2000m de diamètre
 ```{r}
@@ -303,7 +405,7 @@ table_jointe_tbl <- Sites %>%
                         left_join(y = Land_cartoISea_1000, 
                                   by = c("code_site" = "ID"))
 
-palette <- colorNumeric(palette = "plasma",domain = table_jointe_tbl$MOS11)
+palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11)
 
 amp_artificial <- leaflet(data = table_jointe_tbl) %>% 
   addTiles() %>%
@@ -324,7 +426,7 @@ table_jointe_tbl <- Sites %>%
                         left_join(y = Land_cartoISea_1500, 
                                   by = c("code_site" = "ID"))
 
-palette <- colorNumeric(palette = "plasma",domain = table_jointe_tbl$MOS11)
+palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11)
 
 amp_artificial <- leaflet(data = table_jointe_tbl) %>% 
   addTiles() %>%
@@ -345,7 +447,7 @@ table_jointe_tbl <- Sites %>%
                         left_join(y = Land_cartoISea_2000, 
                                   by = c("code_site" = "ID"))
 
-palette <- colorNumeric(palette = "plasma",domain = table_jointe_tbl$MOS11)
+palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11)
 
 amp_artificial <- leaflet(data = table_jointe_tbl) %>% 
   addTiles() %>%
@@ -355,4 +457,22 @@ amp_artificial <- amp_artificial %>% addLegend(position = "bottomright", pal = p
 
 amp_artificial
 ```
+
+```{r}
+
+data_join <- Oiseaux %>% left_join(y = Land_cartoISea_2000, by = c("Code_Maille" = "ID"))
+
+res <- data_join %>%
+  group_by(MOS11, Year) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
+
+ggplot(data = res, aes(x = MOS11, y = Nb_espece, color = Year)) +
+  geom_point() +
+  geom_smooth(method = "auto", se = TRUE, color = "black") +
+  labs(x = "Surfaces artificialisées en % (MOS11)",
+       y = "Nombre d'espèces",
+       title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation")
+
+```
+On a quasiment les mêmes graphs pour les ACP donc on en déduit les mêmes résultats pour toutes les tailles de buffer.
 

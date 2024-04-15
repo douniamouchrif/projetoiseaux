@@ -30,6 +30,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Sites <- read.csv("Data/BiodiverCite_sites.csv", header = TRUE, sep = ";")
 Land_cartoISea <- read.csv("Data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
 Oiseaux <- read.csv("Data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
+Traits <- read.csv("Data/traits-statut-IUCN-biodivercite.csv", header = TRUE, sep = ",")
 ```
 
 ```{r}
@@ -43,12 +44,23 @@ head(Land_cartoISea)
 ```{r}
 head(Oiseaux)
 ```
+```{r}
+head(Traits)
+```
+
+
 
 ```{r}
 Oiseaux$Nom_Latin <- sapply(strsplit(Oiseaux$Nom_Taxon_Cite, "\\|"), function(x) trimws(x[1]))
 Oiseaux$Year <- sapply(strsplit(Oiseaux$Date, "\\-"), function(x) trimws(x[1]))
 print(Oiseaux)
 ```
+
+```{r}
+#renommer la 4éme colonne
+names(Traits)[4] = "Milieu_favori"
+```
+
 
 ```{r}
 #nombre d'oiseaux au total

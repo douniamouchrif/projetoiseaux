@@ -130,7 +130,7 @@ Le faire année par année : 2018-2023 ça va changer ?? si ça change ca veut d
 -> remplacer en abscisse la surface artificialisée par la température par exemple 
 Une ACP : essayer de voir si vraiment la variabilité du nombre d'espèces est expliqué par l'artificialisation ou si elle peut être expliquée par d'autres variables ambiantes.
 Calculer simpson pour les 4 années
-Richesse/shannon : nombre d'espèces présentes, calculer en fonction du mos/taille du buffer à 500 -> quelle est l'occupation du sol ou la diversité/richesse est la plus importante ? Normalement c'est dans les forêts qu'on aura une plus grnde duversité comparé aux surfaces artificialisées. 
+Richesse/shannon : nombre d'espèces présentes, calculer en fonction du mos/taille du buffer à 500 -> quelle est l'occupation du sol ou la diversité/richesse est la plus importante ? Normalement c'est dans les forêts qu'on aura une plus grande diversité comparée aux surfaces artificialisées. 
 
 
 ```{r}

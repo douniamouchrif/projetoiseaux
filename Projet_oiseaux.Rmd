@@ -35,6 +35,10 @@ Oiseaux <- read.csv("Data/Oiseaux_up_to_2023.csv", header = TRUE, sep = "\t")
 ```{r}
 head(Sites)
 ```
+```{r}
+nrow(Land_cartoISea)
+```
+Pour chaque point on a 5 tailles de buffer --> 53x5
 
 ```{r}
 head(Land_cartoISea)
@@ -71,9 +75,9 @@ plot(donnees_agregate$Temperature, donnees_agregate$Denombrement_min, type = "b"
 library(dplyr)
 library(sp)
 library(leaflet)
+library(ggplot2)
 ```
 
-###DOUNIA
 ```{r}
 #on commence avec un buffer size à 500
 Land_cartoISea_500 <- Land_cartoISea%>% filter(BufferSize == 500)
@@ -105,10 +109,18 @@ qplot(x = MOS11, y = Nb_espece, data = res, color = Year, xlab = "Surfaces artif
 #on peut comperer avec les autres types de surface (genre les trucs plus nature) ? 
 #on peut aussi voir l'évolution du nombre d'espèces ou d'oiseau au cours des années 
 ```
+Biodiversité -> diversité d'espèces
+Il faut se concentrer sur la diversité d'espèces et pas sur les nombres donc le dernier graph
+Corrélation par point entre le nombre d'espèce et le % d'artificialisation -> chaque point correspond à une espèce
+Le nombre d'oiseaux c'est pas de la biodiversité, c'est seulement le nombre d'oiseaux comptés -> la biodiversité c'est le nombre d'espèces
+Si on prend le comptage du nombre d'oiseaux, ce dernier augmente quand la surface artificialisée augmente. Il faudrait différencier les années pour les étudier une par une et voir pourquoi il y a des différences entre ces années ? % d'artificialisation ou température, vent, nuage (données ambiantes)
+Le faire année par année : 2018-2023 ça va changer ?? si ça change ca veut dire qu'on a une autre variable explicative on ira chercher les données ambiantes -> faire des comptages des températures en fonction des espèces
+-> remplacer en abscisse la surface artificialisée par la température par exemple 
+Une ACP : essayer de voir si vraiment la variabilité du nombre d'espèces est expliqué par l'artificialisation ou si elle peut être expliquée par d'autres variables ambiantes.
+Calculer simpson pour les 4 années
+Richesse/shannon : nombre d'espèces présentes, calculer en fonction du mos/taille du buffer à 500 -> quelle est l'occupation du sol ou la diversité/richesse est la plus importante ? Normalement c'est dans les forêts qu'on aura une plus grnde duversité comparé aux surfaces artificialisées. 
 
 
-###SUHAILA
-## codes pages 128/129 mais jsp
 ```{r}
 freq <- table(Oiseaux$Nom_Latin)
 
@@ -173,13 +185,6 @@ ggplot(result3, aes(x = Couvert_Nuageux, y = Total, fill = Nom_Latin)) +
   theme_minimal()
 ```
 
-###MATHILDE
-```{r}
-
-
-```
-
-###KARINA
 ## Carte points 
 ```{r}
 lambert_data <- data.frame(X = Land_cartoISea$X, Y = Land_cartoISea$Y)

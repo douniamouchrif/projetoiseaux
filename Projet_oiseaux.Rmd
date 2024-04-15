@@ -93,12 +93,17 @@ j <- site
 
 ### Formule 1
 ```{r}
-oiseaux_par_site = table(Oiseaux$Code_Maille)
+x_ij <- aggregate(Oiseaux$Denombrement_min, by = list(Code_Maille = Oiseaux$Code_Maille, Nom_Latin = Oiseaux$Nom_Latin), FUN = sum) # changer Oiseaux pour l'espèce qu'on veut pour tester
+x_tot_j <- aggregate(Oiseaux$Denombrement_min, by = list(Code_Maille = Oiseaux$Code_Maille), FUN = sum)
 
-x_ij = aggregate(Oiseaux$Denombrement_min, by = list(Code_Maille = Oiseaux$Code_Maille, Nom_Latin = Oiseaux$Nom_Latin), FUN = sum)
+x_ij_merge <- merge(x_ij, x_tot_j, by = "Code_Maille")
+x_ij_merge
 
-p_ij <- x_ij$x / ave(x_ij$x, x_ij$Code_Maille, FUN = sum)
-p_ij
+p_ij <- x_ij_merge$x.x / x_ij_merge$x.y
+proportions <- data.frame(Code_Maille = x_ij_merge$Code_Maille, 
+                             Nom_Latin = x_ij_merge$Nom_Latin,
+                             Proportion = p_ij) # proportion de l'espèce dans le site
+proportions
 ```
 
 ### Formule 2
@@ -110,7 +115,16 @@ for (j in 1:length(unique(x_ij$Code_Maille))) {
   p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
   H_j[j] <- -sum(p_ij_site * log(p_ij_site)) 
 }
-D_2 = exp(H_j)
+D_2 <- data.frame(Code_Maille = unique(x_ij$Code_Maille), D_2 = exp(H_j))
+D_2
+#------
+H_j <- aggregate(x_ij_merge$x.x, by = list(Code_Maille = x_ij_merge$Code_Maille, Nom_Latin = x_ij_merge$Nom_Latin), FUN = sum)
+#H_j
+Entropie <- - H_j$x * log(H_j$x)
+Entropie
+Entropie <- aggregate(H_j$x, by = list(Code_Maille = H_j$Code_Maille), FUN = sum) 
+Entropie
+D_2 <- data.frame(Code_Maille = x_ij_merge$Code_Maille, Entropie = exp(Entropie))
 D_2
 ```
 
@@ -129,10 +143,31 @@ D_3
 ```
 
 ## Tests
+
+### Espece : Erithacus rubecula
 ```{r}
-#avec 2/3 espèces faire les calcul et voir si on trouve bien les bons trucs
-test <- Oiseaux$Denombrement_min[Oiseaux$Nom_Latin == 'Erithacus rubecula']
-test
+# Formule 1 - test
+test <- Oiseaux[Oiseaux$Nom_Latin == 'Erithacus rubecula', ]
+
+x_ij_test <- aggregate(test$Denombrement_min, by = list(Code_Maille = test$Code_Maille, Nom_Latin = test$Nom_Latin), FUN = sum)
+
+total_par_site <- aggregate(Oiseaux$Denombrement_min, by = list(Code_Maille = Oiseaux$Code_Maille), FUN = sum)
+
+x_ij <- merge(x_ij_test, total_par_site, by = "Code_Maille")
+x_ij
+p_ij <- x_ij$x.x / x_ij$x.y
+proportions_df <- data.frame(Code_Maille = x_ij$Code_Maille, 
+                              Proportion_Erithacus_rubecula = p_ij)
+proportions_df
+```
+
+```{r}
+# Formule 2 - test
+H_j <- aggregate(x_ij$x.x, by = list(Code_Maille = x_ij$Code_Maille, Nom_Latin = x_ij$Nom_Latin), FUN = sum)
+
+Entropie <- - H_j$x * log(H_j$x)
+D_2 <- data.frame(Code_Maille = x_ij$Code_Maille, Entropie = exp(Entropie))
+D_2
 ```
 
 

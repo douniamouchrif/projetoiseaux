@@ -97,7 +97,7 @@ table_jointe_tbl <- Sites %>%
 ```
 
 ```{r}
-palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11)
+palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11,reverse=TRUE)
 
 amp_artificial <- leaflet(data = table_jointe_tbl) %>% 
   addTiles() %>%
@@ -198,6 +198,7 @@ res_temperature <- data_2018 %>%
 
 ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.factor(Year))) +
   geom_point() +
+  geom_line() +
   labs(x = "Température",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2018)")
@@ -214,6 +215,7 @@ res_temperature <- data_2019 %>%
 
 ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.factor(Year))) +
   geom_point() +
+  geom_line() +
   labs(x = "Température",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2019)")
@@ -230,6 +232,7 @@ res_temperature <- data_2022 %>%
 
 ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.factor(Year))) +
   geom_point() +
+  geom_line() +
   labs(x = "Température",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2022)")
@@ -246,6 +249,7 @@ res_temperature <- data_2023 %>%
 
 ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.factor(Year))) +
   geom_point() +
+  geom_line() +
   labs(x = "Température",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2023)")
@@ -405,7 +409,7 @@ table_jointe_tbl <- Sites %>%
                         left_join(y = Land_cartoISea_1000, 
                                   by = c("code_site" = "ID"))
 
-palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11)
+palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11,reverse=TRUE)
 
 amp_artificial <- leaflet(data = table_jointe_tbl) %>% 
   addTiles() %>%
@@ -426,7 +430,7 @@ table_jointe_tbl <- Sites %>%
                         left_join(y = Land_cartoISea_1500, 
                                   by = c("code_site" = "ID"))
 
-palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11)
+palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11,reverse = TRUE)
 
 amp_artificial <- leaflet(data = table_jointe_tbl) %>% 
   addTiles() %>%
@@ -447,7 +451,7 @@ table_jointe_tbl <- Sites %>%
                         left_join(y = Land_cartoISea_2000, 
                                   by = c("code_site" = "ID"))
 
-palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11)
+palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11,reverse = TRUE)
 
 amp_artificial <- leaflet(data = table_jointe_tbl) %>% 
   addTiles() %>%

@@ -358,3 +358,74 @@ amp_artificial <- amp_artificial %>% addLegend(position = "bottomright", pal = p
 amp_artificial
 ```
 On constate que les sites situés en dehors de l'agglomération urbaine ont un taux d'artificialisation moins important que les sites localisés dans la ville de Bordeaux, comme par exemple "Talence-B" avec un taux d'artificialisation proche de 0.6.
+
+## 4. Questions
+
+2) la forme de la relation est-elle similaire si on considère non plus l’imperméabilisation du sol mais plutôt la distance au centre ville, sachant que ces deux métriques sont corrélées? On pourra considérer Pey-Berland le centre ville et utiliser le package sf.
+
+Nous avons pris comme point "centre-ville" le point "Bordeaux-A" car nous n'avons pas le point "Pey-Berland" dans nos données.
+```{r}
+centres_villes <- Sites %>% 
+                        left_join(y = Land_cartoISea_500, 
+                                  by = c("code_site" = "ID"))
+
+
+centres_villes <- centres_villes %>% 
+                        left_join(y = Oiseaux, 
+                                  by = c("code_site" = "Code_Maille"))
+
+centre_ville_interet <- centres_villes[centres_villes$name_site == "Bordeaux-A", ]
+
+centre_ville_latitude <- centres_villes$X.y[centres_villes$name_site == "Bordeaux-A"]
+centre_ville_longitude <- centres_villes$Y[centres_villes$name_site == "Bordeaux-A"]
+
+centre_ville_latitude <- centre_ville_latitude[1]
+centre_ville_longitude <- centre_ville_longitude[1]
+
+centres_villes$Y <- as.numeric(centres_villes$Y)
+centre_ville_latitude <- as.numeric(centre_ville_latitude)
+
+centres_villes$distance_centre_ville <- sqrt((centres_villes$X.y - centre_ville_longitude)^2 + (centres_villes$Y - centre_ville_latitude)^2)
+
+donnees_agregate_distance <- aggregate(Denombrement_min ~ distance_centre_ville, data = centres_villes, FUN = sum)
+
+ggplot(data = donnees_agregate_distance, aes(x = distance_centre_ville, y = Denombrement_min)) +
+  geom_point(color = "grey") +
+  geom_smooth(method = "auto", se = FALSE, color = "black") + 
+  xlab("Distance par rapport au centre-ville") +
+  ylab("Nombre d'oiseaux") + 
+  ggtitle("Nombre d'oiseaux en fonction de la distance par rapport au centre-ville") +
+  theme_minimal()
+```
+
+## Carte points en fonction du nombre des oiseaux
+```{r}
+data_join_1 <- Oiseaux %>% 
+  left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
+
+data_join_2 <- data_join_1 %>%
+  right_join(Sites, by = c("Code_Maille" = "code_site"))
+
+Land_cartoISea_500 <- Land_cartoISea %>%
+  filter(BufferSize == 500)
+
+data_join_2 <- data_join_2 %>%
+  left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID"))
+
+data_join_2
+
+data_join_2$Y <- as.numeric(data_join_2$Y)
+data_join_2$X.y <- as.numeric(data_join_2$X.y)
+
+donnees_agregate <- aggregate(Denombrement_min ~ Nom_lieu + X.y + Y + BufferSize + name_site, data = data_join_2, FUN = sum)
+
+palette <- colorNumeric(palette = "viridis", domain = donnees_agregate$Denombrement_min)
+
+amp_oiseaux <- leaflet(data = donnees_agregate) %>% 
+  addTiles() %>%
+  addCircles(~X.y, ~Y, weight = 1, radius = ~BufferSize, color = ~palette(Denombrement_min), opacity = 1, fillOpacity = 0.5, popup = ~name_site)
+
+amp_oiseaux <- amp_oiseaux %>% addLegend(position = "bottomright", pal = palette, values = ~Denombrement_min, title = "Denombrement_min", opacity = 1)
+
+amp_oiseaux
+```

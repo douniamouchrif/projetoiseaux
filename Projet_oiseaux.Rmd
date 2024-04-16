@@ -354,7 +354,6 @@ amp_artificial <- leaflet(data = table_jointe_tbl) %>%
   addCircles(~X.y, ~Y, weight = 1, radius = ~BufferSize, color = ~palette(MOS11), opacity = 1, fillOpacity = 0.5, popup = ~name_site)
 
 amp_artificial <- amp_artificial %>% addLegend(position = "bottomright", pal = palette, values = ~MOS11, title = "MOS11", opacity = 1)
-
 amp_artificial
 ```
 On constate que les sites situés en dehors de l'agglomération urbaine ont un taux d'artificialisation moins important que les sites localisés dans la ville de Bordeaux, comme par exemple "Talence-B" avec un taux d'artificialisation proche de 0.6.
@@ -368,7 +367,6 @@ Nous avons pris comme point "centre-ville" le point "Bordeaux-A" car nous n'avon
 centres_villes <- Sites %>% 
                         left_join(y = Land_cartoISea_500, 
                                   by = c("code_site" = "ID"))
-
 
 centres_villes <- centres_villes %>% 
                         left_join(y = Oiseaux, 
@@ -412,8 +410,6 @@ Land_cartoISea_500 <- Land_cartoISea %>%
 data_join_2 <- data_join_2 %>%
   left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID"))
 
-data_join_2
-
 data_join_2$Y <- as.numeric(data_join_2$Y)
 data_join_2$X.y <- as.numeric(data_join_2$X.y)
 
@@ -426,6 +422,5 @@ amp_oiseaux <- leaflet(data = donnees_agregate) %>%
   addCircles(~X.y, ~Y, weight = 1, radius = ~BufferSize, color = ~palette(Denombrement_min), opacity = 1, fillOpacity = 0.5, popup = ~name_site)
 
 amp_oiseaux <- amp_oiseaux %>% addLegend(position = "bottomright", pal = palette, values = ~Denombrement_min, title = "Denombrement_min", opacity = 1)
-
 amp_oiseaux
 ```

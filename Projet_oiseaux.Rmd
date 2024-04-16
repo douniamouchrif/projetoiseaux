@@ -181,7 +181,7 @@ D_2_ER
 D_3_ER
 ```
 
-## Graphe : Indice de Shanon
+## Graphe : Indice de Shannon
 ```{r}
 annees <- c(2018, 2019, 2022, 2023)
 resultats_D_2_v1 <- list()

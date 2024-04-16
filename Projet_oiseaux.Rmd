@@ -117,15 +117,6 @@ for (j in 1:length(unique(x_ij$Code_Maille))) {
 }
 D_2 <- data.frame(Code_Maille = unique(x_ij$Code_Maille), D_2 = exp(H_j))
 D_2
-#------
-H_j <- aggregate(x_ij_merge$x.x, by = list(Code_Maille = x_ij_merge$Code_Maille, Nom_Latin = x_ij_merge$Nom_Latin), FUN = sum)
-#H_j
-Entropie <- - H_j$x * log(H_j$x)
-Entropie
-Entropie <- aggregate(H_j$x, by = list(Code_Maille = H_j$Code_Maille), FUN = sum) 
-Entropie
-D_2 <- data.frame(Code_Maille = x_ij_merge$Code_Maille, Entropie = exp(Entropie))
-D_2
 ```
 
 ### Formule 3
@@ -166,10 +157,20 @@ proportions_df
 H_j <- aggregate(x_ij$x.x, by = list(Code_Maille = x_ij$Code_Maille, Nom_Latin = x_ij$Nom_Latin), FUN = sum)
 
 Entropie <- - H_j$x * log(H_j$x)
-D_2 <- data.frame(Code_Maille = x_ij$Code_Maille, Entropie = exp(Entropie))
+D_2 <- data.frame(Code_Maille = x_ij$Code_Maille, exp_Entropie = exp(Entropie))
 D_2
 ```
 
+```{r}
+# Formule 3 - test
+D_3 <- numeric(length(unique(x_ij$Code_Maille)))
+
+for (j in 1:length(unique(x_ij$Code_Maille))) {
+  p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
+  D_3[j] <- 1 / sum(p_ij_site^2)
+}
+D_3
+```
 
 
 Graph "Nombre d'oiseaux par température"
@@ -250,18 +251,6 @@ ggplot(data = donnees_agregate2, aes(x = MOS11, y = Denombrement_min, color = Mi
   scale_color_manual(name = "Milieu_favori", 
                      values = c("Agricole" = "red", "Forêt" = "blue", "Bâti" = "orange", "Généraliste" = "pink", "Zone humide" = "green")) +
   theme_minimal()
-```
-
-```{r}
-freq <- table(Oiseaux$Nom_Latin)
-
-X <- runif(100)
-# La moyenne n'est pas définie à r=0, décalage de 10^-8
-r <- seq(-5, 10, .1) + 1E-8
-# Préparation des données
-df <- data.frame(freq, Moyenne = sapply(freq, function(freq) (mean(X^freq))^(1/freq))) 
-ggplot(df, aes(x = freq, y = Moyenne)) +
-  geom_line()
 ```
 
 ## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par température

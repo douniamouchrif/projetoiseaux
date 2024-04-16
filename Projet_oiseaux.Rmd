@@ -113,7 +113,7 @@ H_j <- numeric(length(unique(x_ij$Code_Maille)))
 
 for (j in 1:length(unique(x_ij$Code_Maille))) {
   p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
-  H_j[j] <- -sum(p_ij_site * log(p_ij_site)) 
+  H_j[j] <- ifelse(all(p_ij_site == 0), 0, -sum(p_ij_site * log(p_ij_site)))
 }
 D_2 <- data.frame(Code_Maille = unique(x_ij$Code_Maille), D_2 = exp(H_j))
 D_2
@@ -124,13 +124,15 @@ D_2
 1 divisé par la proba que deux individus qu'on prend dans un ehcantillon soient de la meme espece, donc plus la proba augmente, plus D_3 va diminuer car la proba est au dénominateur
 
 ```{r}
+Code_Maille_unique <- unique(x_ij$Code_Maille)
 D_3 <- numeric(length(unique(x_ij$Code_Maille)))
 
 for (j in 1:length(unique(x_ij$Code_Maille))) {
   p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
-  D_3[j] <-  1 / sum(p_ij_site^2)
+   D_3[j] <- ifelse(all(p_ij_site == 0), 0, 1 / sum(p_ij_site^2))
 }
-D_3
+D_3_df <- data.frame(Code_Maille = Code_Maille_unique, D_3 = D_3)
+D_3_df
 ```
 
 ## Tests
@@ -164,14 +166,24 @@ D_2
 ```{r}
 # Formule 3 - test
 D_3 <- numeric(length(unique(x_ij$Code_Maille)))
+Code_Maille_unique <- unique(x_ij$Code_Maille)
 
 for (j in 1:length(unique(x_ij$Code_Maille))) {
   p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
+  if (p_ij_site == 0) {
+    D_3[j] <- 0
+  } else {
   D_3[j] <- 1 / sum(p_ij_site^2)
+  }
 }
+D_3_df <- data.frame(Code_Maille = Code_Maille_unique, D_3 = D_3)
+D_3_df
+```
+## TEST ULTIMES
+
+```{r}
 D_3
 ```
-
 
 Graph "Nombre d'oiseaux par température"
 ```{r}

@@ -181,8 +181,50 @@ D_2_ER
 D_3_ER
 ```
 
-## Indice de Shanon
+## Graphe : Indice de Shanon
+```{r}
+annees <- c(2018, 2019, 2022, 2023)
+resultats_D_2_v1 <- list()
 
+for (annee in annees) {
+  proportions_oiseaux <- proportion(Oiseaux, annee)
+  D_2_oiseaux <- exp_shannon(proportions_oiseaux)
+  moyenne_D_2 <- mean(D_2_oiseaux$D_2)
+  resultats_D_2_v1[[as.character(annee)]] <- moyenne_D_2
+}
+
+resultats_df <- data.frame(Année = as.integer(names(resultats_D_2_v1)), Moyenne_D_2 = unlist(resultats_D_2_v1))
+
+ggplot(data = resultats_df, aes(x = Année, y = Moyenne_D_2)) +
+  geom_line(color = "pink", size = 1.5) +  # Ligne rose
+  geom_point() +
+  labs(title = "Évolution de la moyenne de D_2_oiseaux par année",
+       x = "Année",
+       y = "Moyenne de D_2_oiseaux") +
+  theme_minimal()
+```
+
+```{r}
+resultats_D_2_v2 <- list()
+
+for (annee in annees) {
+  proportions_oiseaux <- proportion(Oiseaux, annee)
+  D_2_oiseaux <- exp_shannon(proportions_oiseaux)
+  D_2_oiseaux$Année <- as.integer(annee)
+  resultats_D_2_v2[[as.character(annee)]] <- D_2_oiseaux
+}
+
+D_2_annees <- do.call(rbind, resultats_D_2_v2)
+D_2_annees$Année <- factor(D_2_annees$Année)
+
+ggplot(data = D_2_annees, aes(x = Année, y = D_2, group = Code_Maille, color = factor(Code_Maille))) +
+  geom_line() +
+  labs(title = "Évolution de D_2_oiseaux par année",
+       x = "Année",
+       y = "D_2") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
 
 ## Indice de Simpson
 

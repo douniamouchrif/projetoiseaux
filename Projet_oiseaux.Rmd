@@ -93,7 +93,8 @@ j <- site
 
 ### Formule 1
 ```{r}
-proportion <- function(data) {
+proportion <- function(data, year) {
+  data <- data[data$Year == year,]
   x_ij <- aggregate(data$Denombrement_min, by = list(Code_Maille = data$Code_Maille, Nom_Latin = data$Nom_Latin), FUN = sum)
   x_tot_j <- aggregate(data$Denombrement_min, by = list(Code_Maille = data$Code_Maille), FUN = sum)
   x_ij_merge <- merge(x_ij, x_tot_j, by = "Code_Maille")
@@ -145,64 +146,45 @@ proba_simpson <- function(proportions) {
 
 ## Tests
 
-### Espece : Erithacus rubecula
+### Test fictif
 ```{r}
-# Formule 1 - test
-test <- Oiseaux[Oiseaux$Nom_Latin == 'Erithacus rubecula', ]
-
-x_ij_test <- aggregate(test$Denombrement_min, by = list(Code_Maille = test$Code_Maille, Nom_Latin = test$Nom_Latin), FUN = sum)
-
-total_par_site <- aggregate(Oiseaux$Denombrement_min, by = list(Code_Maille = Oiseaux$Code_Maille), FUN = sum)
-
-x_ij <- merge(x_ij_test, total_par_site, by = "Code_Maille")
-x_ij
-p_ij <- x_ij$x.x / x_ij$x.y
-proportions_df <- data.frame(Code_Maille = x_ij$Code_Maille, 
-                              Proportion_Erithacus_rubecula = p_ij)
-proportions_df
-```
-
-```{r}
-# Formule 2 - test
-H_j <- aggregate(x_ij$x.x, by = list(Code_Maille = x_ij$Code_Maille, Nom_Latin = x_ij$Nom_Latin), FUN = sum)
-
-Entropie <- - H_j$x * log(H_j$x)
-D_2 <- data.frame(Code_Maille = x_ij$Code_Maille, exp_Entropie = exp(Entropie))
-D_2
-```
-
-```{r}
-# Formule 3 - test
-D_3 <- numeric(length(unique(x_ij$Code_Maille)))
-Code_Maille_unique <- unique(x_ij$Code_Maille)
-
-for (j in 1:length(unique(x_ij$Code_Maille))) {
-  p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
-  if (p_ij_site == 0) {
-    D_3[j] <- 0
-  } else {
-    D_3[j] <-  1 / sum(p_ij_site^2)
-  }
-}
-D_3_df <- data.frame(Code_Maille = Code_Maille_unique, D_3 = D_3)
-D_3_df
-```
-
-## TEST ULTIMES
-
-```{r}
-# Vecteur d'abondance des espèces pour le test
 x <- c(0, 1, 1, 2, 5)
+y <- c(2021, 2021, 2021, 2021, 2021)
+fictif <- data.frame(Denombrement_min = x, Code_Maille = c('2','2','2','4','4'), Nom_Latin = c('a','b','c','d','e'), Year = y)
+proportions_fictif <- proportion(fictif, 2021)
+D_2_fictif <- exp_shannon(proportions_fictif)
+D_3_fictif <- proba_simpson(proportions_fictif)
 
-# Test des fonctions avec le vecteur d'abondance des espèces
-proportions <- proportion(data.frame(Denombrement_min = x, Code_Maille = c('2','2','2','4','4'), Nom_Latin = c('a','b','c','d','e')))
-D_2 <- exp_shannon(proportions)
-D_3 <- proba_simpson(proportions)
-
-proportions
-D_2
-D_3
+proportions_fictif
+D_2_fictif
+D_3_fictif
 ```
+
+### Test sur tous les oiseaux
+```{r}
+proportions_oiseaux <- proportion(Oiseaux, 2018)
+D_2_oiseaux <- exp_shannon(proportions_oiseaux)
+D_3_oiseaux <- proba_simpson(proportions_oiseaux)
+proportions_oiseaux
+D_2_oiseaux
+D_3_oiseaux
+```
+
+### Test sur une espèce d'oiseaux
+```{r}
+especes_choisies <- as.data.frame(Oiseaux[Oiseaux$Nom_Latin %in% c('Erithacus rubecula', 'Passer domesticus'), ])
+proportions_ER <- proportion(especes_choisies, 2022)
+D_2_ER <- exp_shannon(proportions_ER)
+D_3_ER <- proba_simpson(proportions_ER)
+proportions_ER
+D_2_ER
+D_3_ER
+```
+
+## Indice de Shanon
+
+
+## Indice de Simpson
 
 
 Graph "Nombre d'oiseaux par température"

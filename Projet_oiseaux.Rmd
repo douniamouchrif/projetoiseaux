@@ -27,6 +27,7 @@ library(dplyr)
 library(sp)
 library(leaflet)
 library(ggplot2)
+library(FactoMineR)
 ```
 
 ```{r setup, include=FALSE}
@@ -118,7 +119,6 @@ amp_artificial
 On peut déjà voir une corrélation au niveau de l'artificialisation. Les lieux situés dans le centre ville de Bordeaux et des villes aux alentours ont tendance à avoir un pourcentage d'artificialisation supérieur (environ 60%) par rapport à ceux en périphérie de la ville (environ 10%).
 
 ```{r}
-
 ###on join les df Land_cartoISea_500 et Oiseaux 
 data_join <- Oiseaux %>% left_join(y = Land_cartoISea_500, by = c("Code_Maille" = "ID"))
 
@@ -132,7 +132,6 @@ ggplot(data = res, aes(x = MOS11, y = Nb_espece, color = Year)) +
   labs(x = "Surfaces artificialisées en % (MOS11)",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation")
-
 ```
 
 On peut ici observer la corrélation par point entre le nombre d'espèce et le pourcentage d'artificialisation, chaque point correspond à une espèce. 
@@ -148,7 +147,6 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
   labs(x = "Surfaces artificialisées en % (MOS11)",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation \n(année 2018)")
-
 ```
 Le nombre d'espèce à l'air assez constant sur l'année 2018, on remarque un léger pic à 10% d'artificialisation qui se stabilise après entre 20 et 40% d'artificialisation avec quand même une légère baisse à partir de 30%.
 
@@ -161,7 +159,6 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
   labs(x = "Surfaces artificialisées en % (MOS11)",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation \n(année 2019)")
-
 ```
 
 On remarque ici aussi un pic au niveau des 10% d'artificialisation puis un résultat assez constant. Ce qui peut parraitre surprenant c'est qu'avec 0% d'artificialisation on avait environ 25 espèces alors qu'avec presque 30% d'artificialisation, on a environ 26 espèces. Le nombre d'espèces observées augmente avec l'artificialisation ??
@@ -187,7 +184,6 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
   labs(x = "Surfaces artificialisées en % (MOS11)",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation \n(année 2023)")
-
 ```
 ATTENTION À L'INTERPRÉTATION CAR LES ECHELLES NE SONT PAS LES MÊMES SUR L'AXE DES ABSCISSES
 On voit que les tendances changent, surtout en 2023 avec un nombre d'espèce qui semble d'augmenter avec le pourcentage d'artificialisation. On a toujours le pic au niveau des 10% et ensuite, au lieu d'avoir un nombre d'espèce qui diminue considérablement, on a une courbe qui se maintient plutôt bien. Oon remarque même que cette dernière semble monter vers la fin, que peut-on en déduire ??
@@ -199,9 +195,8 @@ Relation en U inversé : Dans certains écosystèmes, une relation en U inversé
 On commence par s'intéresser à la température. 
 
 ```{r}
-
 data_2018 <- data_join %>%
-  filter(year(Date) == 2018)
+  filter(Year == 2018)
 
 res_temperature <- data_2018 %>%
   group_by(Temperature, Year) %>%
@@ -213,13 +208,11 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
   labs(x = "Température",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2018)")
-
 ```
 On remarque une forme de parabole. Autour des 10°C, c'est à cette dernière qu'on observe le plus grand nombre d'espèces d'oiseaux (environ 64).
 ```{r}
-
 data_2019 <- data_join %>%
-  filter(year(Date) == 2019)
+  filter(Year == 2019)
 
 res_temperature <- data_2019 %>%
   group_by(Temperature, Year) %>%
@@ -231,14 +224,12 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
   labs(x = "Température",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2019)")
-
 ```
 En 2019 la courbe est très différente de celle de 2018. En effet, à 15°C on observe une chute du nombre d'espèces qui pourrait être causé par un événement spécifique à cette période de l'année. Cela pourrait inclure des phénomènes météorologiques extrêmes, des perturbations humaines, ou des événements écologiques particuliers ( comme par exemple un pic de prédation). Nous allons comparer les autres données météorologiques que nous possédons pour comparer ce résultat avec ceux des autres années.
 
 ```{r}
-
 data_2022 <- data_join %>%
-  filter(year(Date) == 2022)
+  filter(Year == 2022)
 
 res_temperature <- data_2022 %>%
   group_by(Temperature, Year) %>%
@@ -250,14 +241,12 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
   labs(x = "Température",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2022)")
-
 ```
 On retrouve une forme de parabole qu'on observait déjà en 2018, cependant, on voit que le nombre d'espèces à 20°C est bien supérieur à celui de 2018. On retrouve un pic à 15°C qu'on avait perdu en 2019.
 
 ```{r}
-
 data_2023 <- data_join %>%
-  filter(year(Date) == 2023)
+  filter(Year == 2023)
 
 res_temperature <- data_2023 %>%
   group_by(Temperature, Year) %>%
@@ -269,14 +258,12 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
   labs(x = "Température",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2023)")
-
 ```
 Finalement en 2023, on a encore cette forme de parabole mais qui s'atténue. En effet, on a un pic à 10°C mais la descente est ensuite plus douce, à 20°C, on a donc plus d'espèces d'oiseaux en 2023 qu'en 2018.
 
 Maintenant on regarde le niveau du vent.
 
 ```{r}
-
 # Convertir la colonne "Vent" en facteur
 data_join$Vent <- factor(data_join$Vent, levels = c("0 - Calme", "1 - Très légère brise", "2 - Légère brise", "3 - Petite brise"))
 
@@ -291,7 +278,6 @@ ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
   labs(x = "Vent",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du niveau de vent")
-
 ```
 On remarque que le vent n'a pas un impact significatif dans l'évolution du nombre d'espèces d'oiseaux. 
 
@@ -337,7 +323,6 @@ ggplot(data = res_couverture_nuageuse, aes(x = Couvert_Nuageux_factor, y = Nb_es
   labs(x = "Couverture Nuageuse",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la couverture nuageuse")
-
 ```
 Pareil pour la couverture nuageuse, je mets seulement 2018 et on aura juste à changer l'année pour avoir les autres
 
@@ -481,7 +466,6 @@ amp_artificial
 ```
 
 ```{r}
-
 data_join <- Oiseaux %>% left_join(y = Land_cartoISea_2000, by = c("Code_Maille" = "ID"))
 
 res <- data_join %>%
@@ -494,7 +478,6 @@ ggplot(data = res, aes(x = MOS11, y = Nb_espece, color = Year)) +
   labs(x = "Surfaces artificialisées en % (MOS11)",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation")
-
 ```
 
 On a quasiment les mêmes graphs pour les ACP donc on en déduit les mêmes résultats pour toutes les tailles de buffer. 
@@ -656,7 +639,6 @@ ggplot(data = D_2_annees, aes(x = Année, y = D_2, group = Code_Maille, color = 
 ```
 
 ## Graphe : Indice de Simpson
-
 ```{r}
 resultats_D_3 <- list()
 annees <- c(2018, 2019, 2022, 2023)

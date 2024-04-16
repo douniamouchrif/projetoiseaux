@@ -93,30 +93,35 @@ j <- site
 
 ### Formule 1
 ```{r}
-x_ij <- aggregate(Oiseaux$Denombrement_min, by = list(Code_Maille = Oiseaux$Code_Maille, Nom_Latin = Oiseaux$Nom_Latin), FUN = sum) # changer Oiseaux pour l'espèce qu'on veut pour tester
-x_tot_j <- aggregate(Oiseaux$Denombrement_min, by = list(Code_Maille = Oiseaux$Code_Maille), FUN = sum)
-
-x_ij_merge <- merge(x_ij, x_tot_j, by = "Code_Maille")
-x_ij_merge
-
-p_ij <- x_ij_merge$x.x / x_ij_merge$x.y
-proportions <- data.frame(Code_Maille = x_ij_merge$Code_Maille, 
-                             Nom_Latin = x_ij_merge$Nom_Latin,
-                             Proportion = p_ij) # proportion de l'espèce dans le site
-proportions
+proportion <- function(data) {
+  x_ij <- aggregate(data$Denombrement_min, by = list(Code_Maille = data$Code_Maille, Nom_Latin = data$Nom_Latin), FUN = sum)
+  x_tot_j <- aggregate(data$Denombrement_min, by = list(Code_Maille = data$Code_Maille), FUN = sum)
+  x_ij_merge <- merge(x_ij, x_tot_j, by = "Code_Maille")
+  p_ij <- x_ij_merge$x.x / x_ij_merge$x.y
+  
+  proportions <- data.frame(Code_Maille = x_ij_merge$Code_Maille,
+                            Nom_Latin = x_ij_merge$Nom_Latin,
+                            Proportion = p_ij)
+  
+  return(proportions)
+}
 ```
 
 ### Formule 2
 H_j = entropie (somme par site)
 ```{r}
-H_j <- numeric(length(unique(x_ij$Code_Maille)))
-
-for (j in 1:length(unique(x_ij$Code_Maille))) {
-  p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
-  H_j[j] <- ifelse(all(p_ij_site == 0), 0, -sum(p_ij_site * log(p_ij_site)))
+exp_shannon <- function(proportions) {
+  H_j <- numeric(length(unique(proportions$Code_Maille)))
+  
+  for (j in 1:length(unique(proportions$Code_Maille))) {
+    p_ij_site <- proportions$Proportion[proportions$Code_Maille == unique(proportions$Code_Maille)[j] & proportions$Proportion > 0]
+    H_j[j] <- -sum(p_ij_site * log(p_ij_site))
+  }
+  
+  D_2 <- data.frame(Code_Maille = unique(proportions$Code_Maille), D_2 = exp(H_j))
+  
+  return(D_2)
 }
-D_2 <- data.frame(Code_Maille = unique(x_ij$Code_Maille), D_2 = exp(H_j))
-D_2
 ```
 
 ### Formule 3
@@ -124,15 +129,18 @@ D_2
 1 divisé par la proba que deux individus qu'on prend dans un ehcantillon soient de la meme espece, donc plus la proba augmente, plus D_3 va diminuer car la proba est au dénominateur
 
 ```{r}
-D_3 <- numeric(length(unique(x_ij$Code_Maille)))
-Code_Maille_unique <- unique(x_ij$Code_Maille)
-
-for (j in 1:length(unique(x_ij$Code_Maille))) {
-  p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
-  D_3[j] <- ifelse(all(p_ij_site == 0), 0, 1 / sum(p_ij_site^2))
+proba_simpson <- function(proportions) {
+  D_3 <- numeric(length(unique(proportions$Code_Maille)))
+  
+  for (j in 1:length(unique(proportions$Code_Maille))) {
+    p_ij_site <- proportions$Proportion[proportions$Code_Maille == unique(proportions$Code_Maille)[j] & proportions$Proportion > 0]
+    D_3[j] <- 1 / sum(p_ij_site^2)
+  }
+  
+  D_3_df <- data.frame(Code_Maille = unique(proportions$Code_Maille), D_3 = D_3)
+  
+  return(D_3_df)
 }
-D_3_df <- data.frame(Code_Maille = Code_Maille_unique, D_3 = D_3)
-D_3_df
 ```
 
 ## Tests
@@ -183,7 +191,17 @@ D_3_df
 ## TEST ULTIMES
 
 ```{r}
+# Vecteur d'abondance des espèces pour le test
+x <- c(0, 1, 1, 2, 5)
 
+# Test des fonctions avec le vecteur d'abondance des espèces
+proportions <- proportion(data.frame(Denombrement_min = x, Code_Maille = c('2','2','2','4','4'), Nom_Latin = c('a','b','c','d','e')))
+D_2 <- exp_shannon(proportions)
+D_3 <- proba_simpson(proportions)
+
+proportions
+D_2
+D_3
 ```
 
 

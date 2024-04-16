@@ -253,18 +253,6 @@ ggplot(data = donnees_agregate2, aes(x = MOS11, y = Denombrement_min, color = Mi
   theme_minimal()
 ```
 
-```{r}
-freq <- table(Oiseaux$Nom_Latin)
-
-X <- runif(100)
-# La moyenne n'est pas définie à r=0, décalage de 10^-8
-r <- seq(-5, 10, .1) + 1E-8
-# Préparation des données
-df <- data.frame(freq, Moyenne = sapply(freq, function(freq) (mean(X^freq))^(1/freq))) 
-ggplot(df, aes(x = freq, y = Moyenne)) +
-  geom_line()
-```
-
 ## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par température
 ```{r}
 result <- Oiseaux %>%

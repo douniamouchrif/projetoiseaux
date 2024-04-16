@@ -226,7 +226,29 @@ ggplot(data = D_2_annees, aes(x = Année, y = D_2, group = Code_Maille, color = 
   theme(legend.position = "none")
 ```
 
-## Indice de Simpson
+## Graphe : Indice de Simpson
+
+```{r}
+resultats_D_3 <- list()
+annees <- c(2018, 2019, 2022, 2023)
+for (annee in annees) {
+  proportions_oiseaux <- proportion(Oiseaux, annee)
+  D_3_oiseaux <- proba_simpson(proportions_oiseaux)
+  D_3_oiseaux$Année <- as.integer(annee)
+  resultats_D_3[[as.character(annee)]] <- D_3_oiseaux
+}
+
+D_3_annees <- do.call(rbind, resultats_D_3)
+D_3_annees$Année <- factor(D_3_annees$Année)
+
+ggplot(data = D_3_annees, aes(x = Année, y = D_3, group = Code_Maille, color = factor(Code_Maille))) +
+  geom_line() +
+  labs(title = "Évolution de l'indice de simpson par sites au cours des années",
+       x = "Année",
+       y = "D_2") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
 
 
 Graph "Nombre d'oiseaux par température"

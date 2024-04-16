@@ -113,7 +113,7 @@ H_j <- numeric(length(unique(x_ij$Code_Maille)))
 
 for (j in 1:length(unique(x_ij$Code_Maille))) {
   p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
-  H_j[j] <- ifelse(all(p_ij_site == 0), 0, -sum(p_ij_site * log(p_ij_site)))
+  H_j[j] <- -sum(p_ij_site * log(p_ij_site)) 
 }
 D_2 <- data.frame(Code_Maille = unique(x_ij$Code_Maille), D_2 = exp(H_j))
 D_2
@@ -125,14 +125,12 @@ D_2
 
 ```{r}
 D_3 <- numeric(length(unique(x_ij$Code_Maille)))
-Code_Maille_unique <- unique(x_ij$Code_Maille)
 
 for (j in 1:length(unique(x_ij$Code_Maille))) {
   p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
-  D_3[j] <- ifelse(all(p_ij_site == 0), 0, 1 / sum(p_ij_site^2))
+  D_3[j] <-  1 / sum(p_ij_site^2)
 }
-D_3_df <- data.frame(Code_Maille = Code_Maille_unique, D_3 = D_3)
-D_3_df
+D_3
 ```
 
 ## Tests
@@ -166,24 +164,12 @@ D_2
 ```{r}
 # Formule 3 - test
 D_3 <- numeric(length(unique(x_ij$Code_Maille)))
-Code_Maille_unique <- unique(x_ij$Code_Maille)
 
 for (j in 1:length(unique(x_ij$Code_Maille))) {
   p_ij_site <- p_ij[x_ij$Code_Maille == unique(x_ij$Code_Maille)[j]]
-  if (p_ij_site == 0) {
-    D_3[j] <- 0
-  } else {
-    D_3[j] <-  1 / sum(p_ij_site^2)
-  }
+  D_3[j] <- 1 / sum(p_ij_site^2)
 }
-D_3_df <- data.frame(Code_Maille = Code_Maille_unique, D_3 = D_3)
-D_3_df
-```
-
-## TEST ULTIMES
-
-```{r}
-
+D_3
 ```
 
 
@@ -191,7 +177,6 @@ Graph "Nombre d'oiseaux par température"
 ```{r}
 donnees_agregate <- aggregate(Denombrement_min ~ Temperature, data = Oiseaux, FUN = sum)
 
-# Tracer le graphique
 plot(donnees_agregate$Temperature, donnees_agregate$Denombrement_min, type = "b", 
      xlab = "Température (°C)", ylab = "Nombre d'oiseaux",
      main = "Nombre d'oiseaux par température",
@@ -240,7 +225,7 @@ Une ACP : essayer de voir si vraiment la variabilité du nombre d'espèces est e
 Calculer simpson pour les 4 années
 Richesse/shannon : nombre d'espèces présentes, calculer en fonction du mos/taille du buffer à 500 -> quelle est l'occupation du sol ou la diversité/richesse est la plus importante ? Normalement c'est dans les forêts qu'on aura une plus grande diversité comparée aux surfaces artificialisées. 
 
-Graph "Diversité en fonction du nombre d'oiseaux et le degré d'artificialisation"
+Graph "Diversité en fonction du nombre d'oiseaux et le degré d'artificialisation" pour la période 2018-2023
 ```{r}
 data_join_1 <- Oiseaux %>% 
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
@@ -343,7 +328,6 @@ Land_cartoISea_500 <- subset(Land_cartoISea, BufferSize == 500)
 table_jointe_tbl <- Sites %>% 
                         left_join(y = Land_cartoISea_500, 
                                   by = c("code_site" = "ID"))
-table_jointe_tbl
 ```
 
 ```{r}
@@ -358,3 +342,42 @@ amp_artificial <- amp_artificial %>% addLegend(position = "bottomright", pal = p
 amp_artificial
 ```
 On constate que les sites situés en dehors de l'agglomération urbaine ont un taux d'artificialisation moins important que les sites localisés dans la ville de Bordeaux, comme par exemple "Talence-B" avec un taux d'artificialisation proche de 0.6.
+
+## 4. Questions
+
+2) la forme de la relation est-elle similaire si on considère non plus l’imperméabilisation du sol mais plutôt la distance au centre ville, sachant que ces deux métriques sont corrélées? On pourra considérer Pey-Berland le centre ville et utiliser le package sf.
+
+Nous avons pris comme point "centre-ville" le point "Bordeaux-A" car nous n'avons pas le point "Pey-Berland" dans nos données.
+```{r}
+centres_villes <- Sites %>% 
+                        left_join(y = Land_cartoISea_500, 
+                                  by = c("code_site" = "ID"))
+
+
+centres_villes <- centres_villes %>% 
+                        left_join(y = Oiseaux, 
+                                  by = c("code_site" = "Code_Maille"))
+
+centre_ville_interet <- centres_villes[centres_villes$name_site == "Bordeaux-A", ]
+
+centre_ville_latitude <- centres_villes$X.y[centres_villes$name_site == "Bordeaux-A"]
+centre_ville_longitude <- centres_villes$Y[centres_villes$name_site == "Bordeaux-A"]
+
+centre_ville_latitude <- centre_ville_latitude[1]
+centre_ville_longitude <- centre_ville_longitude[1]
+
+centres_villes$Y <- as.numeric(centres_villes$Y)
+centre_ville_latitude <- as.numeric(centre_ville_latitude)
+
+centres_villes$distance_centre_ville <- sqrt((centres_villes$X.y - centre_ville_longitude)^2 + (centres_villes$Y - centre_ville_latitude)^2)
+
+donnees_agregate_distance <- aggregate(Denombrement_min ~ distance_centre_ville, data = centres_villes, FUN = sum)
+
+ggplot(data = donnees_agregate_distance, aes(x = distance_centre_ville, y = Denombrement_min)) +
+  geom_point(color = "grey") +
+  geom_smooth(method = "auto", se = FALSE, color = "black") + 
+  xlab("Distance par rapport au centre-ville") +
+  ylab("Nombre d'oiseaux") + 
+  ggtitle("Nombre d'oiseaux en fonction de la distance par rapport au centre-ville") +
+  theme_minimal()
+```

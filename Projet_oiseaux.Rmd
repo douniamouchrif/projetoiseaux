@@ -309,15 +309,17 @@ ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
 ```
 
 Dans Couvert Nuageux, comme dans la qualité du Vent, les valeurs sont à la fois numériques et du texte, on a changé pour avoir des groupes, ainsi : 
-- 1 : 25-50%
-- 2 : 100%
+- 1 : 0-25%
+- 2 : 25-50%
 - 3 : 50-75%
 - 4 : 75-100%
-- 5 : 0-25%
+- 5 : 100%
+- 6 : Aucun
 ```{r}
-data_join$Couvert_Nuageux <- gsub("100,00 %", "100%", data_join$Couvert_Nuageux)
-data_join$Couvert_Nuageux_factor <- as.numeric(as.factor(data_join$Couvert_Nuageux))
-data_join
+niveaux <- c("0-25%", "25-50%", "50-75%", "75-100%", "100,00 %", "Aucun")
+valeurs_numeriques <- c(1, 2, 3, 4, 5, 6)
+data_join$Couvert_Nuageux_factor <- factor(data_join$Couvert_Nuageux, levels = niveaux)
+data_join$Couvert_Nuageux_factor <- valeurs_numeriques[match(data_join$Couvert_Nuageux_factor, niveaux)]
 ```
 
 Et finalement la couverture nuageuse.
@@ -751,13 +753,11 @@ ggplot(data = D_3_annees, aes(x = Année, y = D_3, group = Code_Maille, color = 
   theme(legend.position = "none")
 ```
 
-
 Graph "Nombre d'oiseaux par température"
 ```{r}
-donnees_agregate <- aggregate(Denombrement_min ~ Temperature, data = Oiseaux, FUN = sum)
+donnees_agregate <- aggregate(Nom_Latin ~ Temperature, data = Oiseaux, FUN = function(x) length(unique(x)))
 
-# Tracer le graphique
-plot(donnees_agregate$Temperature, donnees_agregate$Denombrement_min, type = "b", 
+plot(donnees_agregate$Temperature, donnees_agregate$Nom_Latin, type = "b", 
      xlab = "Température (°C)", ylab = "Nombre d'oiseaux",
      main = "Nombre d'oiseaux par température",
      col = "blue", pch = 19)
@@ -785,17 +785,17 @@ Land_cartoISea_500 <- Land_cartoISea %>%
 data_join_2 <- data_join_1 %>%
   left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID"))
 
-donnees_agregate2 <- aggregate(Denombrement_min ~ MOS11 + Year + Milieu_favori, data = data_join_2, FUN = sum)
+donnees_agregate2 <- aggregate(Nom_Latin ~ MOS11 + Year + Milieu_favori, data = data_join_2, FUN = function(x) length(unique(x)))
 
 donnees_agregate2$Year <- factor(donnees_agregate2$Year)
 
-ggplot(data = donnees_agregate2, aes(x = MOS11, y = Denombrement_min, color = Milieu_favori)) +
+ggplot(data = donnees_agregate2, aes(x = MOS11, y = Nom_Latin, color = Milieu_favori)) +
   geom_point(color = "grey") +
   geom_smooth(method = "auto", se = TRUE, color = "black") + 
   geom_smooth(method = "lm", se = FALSE, aes(group = Milieu_favori), linetype = "solid") +
   xlab("Surfaces artificialisées en % (MOS11)") +
-  ylab("Nombre d'oiseaux") + 
-  ggtitle("Diversité en fonction du nombre d'oiseaux et le degré d'artificialisation") +
+  ylab("Nombre d'espèces d'oiseaux") + 
+  ggtitle("Diversité en fonction du nombre d'espèces d'oiseaux et le degré d'artificialisation") +
   scale_color_manual(name = "Milieu_favori", 
                      values = c("Agricole" = "red", "Forêt" = "blue", "Bâti" = "orange", "Généraliste" = "pink", "Zone humide" = "green")) +
   theme_minimal()

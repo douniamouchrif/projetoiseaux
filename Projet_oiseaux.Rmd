@@ -287,6 +287,8 @@ ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du niveau de vent")
 ```
+Difficile à interpréter parce que le niveau de vent aura un impact sur si on entend les oiseaux ou pas --> plus y'a de vent, moins on entend les oiseaux.
+
 On remarque que le vent n'a pas un impact significatif dans l'évolution du nombre d'espèces d'oiseaux car ce dernier reste assez constant avec une légère baisse lorsque le vent se fait ressentir un peu plus.
 
 Je sais pas si ça sert a quelque chose d'analyser pour chaque année sachant que quand on fait sur toutes les années y'a pas grand chose à interpréter. Je mets le code pour une année et on aura juste à la changer pour tout avoir. 

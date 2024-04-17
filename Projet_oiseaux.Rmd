@@ -676,13 +676,11 @@ ggplot(data = D_3_annees, aes(x = Année, y = D_3, group = Code_Maille, color = 
   theme(legend.position = "none")
 ```
 
-
 Graph "Nombre d'oiseaux par température"
 ```{r}
-donnees_agregate <- aggregate(Denombrement_min ~ Temperature, data = Oiseaux, FUN = sum)
+donnees_agregate <- aggregate(Nom_Latin ~ Temperature, data = Oiseaux, FUN = function(x) length(unique(x)))
 
-# Tracer le graphique
-plot(donnees_agregate$Temperature, donnees_agregate$Denombrement_min, type = "b", 
+plot(donnees_agregate$Temperature, donnees_agregate$Nom_Latin, type = "b", 
      xlab = "Température (°C)", ylab = "Nombre d'oiseaux",
      main = "Nombre d'oiseaux par température",
      col = "blue", pch = 19)

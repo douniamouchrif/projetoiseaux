@@ -308,15 +308,17 @@ ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
 ```
 
 Dans Couvert Nuageux, comme dans la qualité du Vent, les valeurs sont à la fois numériques et du texte, on a changé pour avoir des groupes, ainsi : 
-- 1 : 25-50%
-- 2 : 100%
+- 1 : 0-25%
+- 2 : 25-50%
 - 3 : 50-75%
 - 4 : 75-100%
-- 5 : 0-25%
+- 5 : 100%
+- 6 : Aucun
 ```{r}
-data_join$Couvert_Nuageux <- gsub("100,00 %", "100%", data_join$Couvert_Nuageux)
-data_join$Couvert_Nuageux_factor <- as.numeric(as.factor(data_join$Couvert_Nuageux))
-data_join
+niveaux <- c("0-25%", "25-50%", "50-75%", "75-100%", "100,00 %", "Aucun")
+valeurs_numeriques <- c(1, 2, 3, 4, 5, 6)
+data_join$Couvert_Nuageux_factor <- factor(data_join$Couvert_Nuageux, levels = niveaux)
+data_join$Couvert_Nuageux_factor <- valeurs_numeriques[match(data_join$Couvert_Nuageux_factor, niveaux)]
 ```
 
 Et finalement la couverture nuageuse.

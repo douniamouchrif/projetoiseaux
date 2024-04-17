@@ -644,7 +644,13 @@ for (annee in annees) {
 D_2_annees <- do.call(rbind, resultats_D_2_v2)
 D_2_annees$Année <- factor(D_2_annees$Année)
 
-ggplot(data = D_2_annees, aes(x = Année, y = D_2, group = Code_Maille, color = factor(Code_Maille))) +
+#filtrer les sites présents sur toutes les années
+nombre_annees_par_site <- table(D_2_annees$Code_Maille)
+nombre_total_annees <- length(unique(D_2_annees$Année))
+sites_present_toutes_annees <- names(nombre_annees_par_site[nombre_annees_par_site == nombre_total_annees])
+D_2_annees_filtre <- D_2_annees[D_2_annees$Code_Maille %in% sites_present_toutes_annees,]
+
+ggplot(data = D_2_annees_filtre, aes(x = Année, y = D_2, group = Code_Maille, color = factor(Code_Maille))) +
   geom_line() +
   labs(title = "Évolution de D_2_oiseaux par année",
        x = "Année",
@@ -667,11 +673,17 @@ for (annee in annees) {
 D_3_annees <- do.call(rbind, resultats_D_3)
 D_3_annees$Année <- factor(D_3_annees$Année)
 
-ggplot(data = D_3_annees, aes(x = Année, y = D_3, group = Code_Maille, color = factor(Code_Maille))) +
+#filtrer les sites présents sur toutes les années
+nombre_annees_par_site <- table(D_3_annees$Code_Maille)
+nombre_total_annees <- length(unique(D_3_annees$Année))
+sites_present_toutes_annees <- names(nombre_annees_par_site[nombre_annees_par_site == nombre_total_annees])
+D_3_annees_filtre <- D_3_annees[D_3_annees$Code_Maille %in% sites_present_toutes_annees,]
+
+ggplot(data = D_3_annees_filtre, aes(x = Année, y = D_3, group = Code_Maille, color = factor(Code_Maille))) +
   geom_line() +
-  labs(title = "Évolution de l'indice de simpson par sites au cours des années",
+  labs(title = "Évolution de D_3 par sites au cours des années",
        x = "Année",
-       y = "D_2") +
+       y = "D_3") +
   theme_minimal() +
   theme(legend.position = "none")
 ```

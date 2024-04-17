@@ -825,7 +825,7 @@ Une ACP : essayer de voir si vraiment la variabilité du nombre d'espèces est e
 Calculer simpson pour les 4 années
 Richesse/shannon : nombre d'espèces présentes, calculer en fonction du mos/taille du buffer à 500 -> quelle est l'occupation du sol ou la diversité/richesse est la plus importante ? Normalement c'est dans les forêts qu'on aura une plus grande diversité comparée aux surfaces artificialisées. 
 
-Graph "Diversité en fonction du nombre d'oiseaux et le degré d'artificialisation"
+## Graphe "Diversité en fonction du nombre d'oiseaux et le degré d'artificialisation"
 ```{r}
 data_join_1 <- Oiseaux %>% 
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))

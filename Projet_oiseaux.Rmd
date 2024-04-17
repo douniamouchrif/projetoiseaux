@@ -829,14 +829,14 @@ data_join_2 <- data_join_2 %>%
 data_join_2$Y <- as.numeric(data_join_2$Y)
 data_join_2$X.y <- as.numeric(data_join_2$X.y)
 
-donnees_agregate <- aggregate(Denombrement_min ~ Nom_lieu + X.y + Y + BufferSize + name_site, data = data_join_2, FUN = sum)
+donnees_agregate <- aggregate(Nom_Latin ~ Nom_lieu + X.y + Y + BufferSize + name_site, data = data_join_2, FUN = function(x) length(unique(x)))
 
-palette <- colorNumeric(palette = "viridis", domain = donnees_agregate$Denombrement_min)
+palette <- colorNumeric(palette = "viridis", domain = donnees_agregate$Nom_Latin)
 
 amp_oiseaux <- leaflet(data = donnees_agregate) %>% 
   addTiles() %>%
-  addCircles(~X.y, ~Y, weight = 1, radius = ~BufferSize, color = ~palette(Denombrement_min), opacity = 1, fillOpacity = 0.5, popup = ~name_site)
+  addCircles(~X.y, ~Y, weight = 1, radius = ~BufferSize, color = ~palette(Nom_Latin), opacity = 1, fillOpacity = 0.5, popup = ~name_site)
 
-amp_oiseaux <- amp_oiseaux %>% addLegend(position = "bottomright", pal = palette, values = ~Denombrement_min, title = "Denombrement_min", opacity = 1)
+amp_oiseaux <- amp_oiseaux %>% addLegend(position = "bottomright", pal = palette, values = ~Nom_Latin, title = "Nombre d'espèces", opacity = 1)
 amp_oiseaux
 ```

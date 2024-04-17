@@ -570,9 +570,31 @@ ggplot(data = res, aes(x = MOS11, y = Nb_espece, color = Year)) +
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation")
 ```
 
+
+
 On a quasiment les mêmes graphs que pour les ACP donc on en déduit les mêmes résultats pour toutes les tailles de buffer. 
 
 ## Mais maintenant si on prend le BufferSize comme une donnée quelconque, est-ce que ce dernier à un impact sur le nombre d'espèces qu'on observe ?
+
+```{r}
+data_join <- Oiseaux %>% left_join(y = Land_cartoISea, by = c("Code_Maille" = "ID"))
+data_join
+```
+
+```{r}
+variables <- data_join %>%
+  select(MOS11, BufferSize, Nom_Latin) %>%
+  na.omit()
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
 
 ```{r}
 # Nombre total pour chaque modalité Milieu_favori
@@ -920,7 +942,7 @@ data_join_2$X.y <- as.numeric(data_join_2$X.y)
 
 donnees_agregate <- aggregate(Nom_Latin ~ Nom_lieu + X.y + Y + BufferSize + name_site, data = data_join_2, FUN = function(x) length(unique(x)))
 
-palette <- colorNumeric(palette = "viridis", domain = donnees_agregate$Nom_Latin)
+palette <- colorNumeric(palette = "magma", domain = donnees_agregate$Nom_Latin,reverse = TRUE)
 
 amp_oiseaux <- leaflet(data = donnees_agregate) %>% 
   addTiles() %>%

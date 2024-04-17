@@ -825,6 +825,32 @@ Une ACP : essayer de voir si vraiment la variabilité du nombre d'espèces est e
 Calculer simpson pour les 4 années
 Richesse/shannon : nombre d'espèces présentes, calculer en fonction du mos/taille du buffer à 500 -> quelle est l'occupation du sol ou la diversité/richesse est la plus importante ? Normalement c'est dans les forêts qu'on aura une plus grande diversité comparée aux surfaces artificialisées. 
 
+
+```{r}
+data_join_1 <- Oiseaux %>% 
+  left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
+
+Land_cartoISea_500 <- Land_cartoISea %>%
+  filter(BufferSize == 500)
+
+data_join_2 <- data_join_1 %>%
+  left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID"))
+
+donnees_agregate2 <- aggregate(Nom_Latin ~ MOS11 + Year + Régime.alimentaire, data = data_join_2, FUN = function(x) length(unique(x)))
+
+donnees_agregate2$Year <- factor(donnees_agregate2$Year)
+
+ggplot(data = donnees_agregate2, aes(x = MOS11, y = Nom_Latin, color = Régime.alimentaire)) +
+  geom_point(color = "grey") +
+  geom_smooth(method = "auto", se = TRUE, color = "black") + 
+  geom_smooth(method = "lm", se = FALSE, aes(group = Régime.alimentaire), linetype = "solid") +
+  xlab("Surfaces artificialisées en % (MOS11)") +
+  ylab("Nombre d'espèces d'oiseaux") + 
+  ggtitle("Diversité en fonction du nombre d'espèces d'oiseaux et le degré d'artificialisation") +
+  scale_color_manual(name = "Régime.alimentaire", 
+                     values = c("Carnivore" = "red", "Mixte" = "blue", "Végétarien" = "orange")) +
+  theme_minimal()
+```
 ## Graphe "Diversité en fonction du nombre d'oiseaux et le degré d'artificialisation"
 ```{r}
 data_join_1 <- Oiseaux %>% 

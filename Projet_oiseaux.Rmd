@@ -231,7 +231,8 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2019)")
 ```
-
+Changement dasn les températures qui a impacté l'observations des oiseaux -> plus chaud plus tôt donc des oiseaux qui avaient migré n'étaient pas encore revenus et inversement.
+Pic de prédation -> peu probable.
 En 2019 la courbe est très différente de celle de 2018. En effet, à 15°C on observe une chute du nombre d'espèces qui pourrait être causé par un événement spécifique à cette période de l'année. Cela pourrait inclure des phénomènes météorologiques extrêmes, des perturbations humaines, ou des événements écologiques particuliers (comme par exemple un pic de prédation). Nous allons comparer les autres données météorologiques que nous possédons pour comparer ce résultat avec ceux des autres années.
 
 ```{r}
@@ -372,6 +373,22 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
+```{r}
+variables <- data_join %>%
+  select(MOS11, Nom_Latin) %>%
+  na.omit()
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+
+
 - Axes d'inertie : Le graphique montre deux dimensions principales. La première dimension (Dim 1) explique 27,96% de la variance tandis que la deuxième dimension (Dim 2) en explique 23,34%. Ensemble, ces deux dimensions expliquent un peu plus de la moitié de la variance totale.
 - Corrélation des variables avec les axes :
 Le vent semble être fortement corrélé avec la deuxième dimension et, dans une moindre mesure, avec la première dimension.
@@ -395,6 +412,37 @@ data_final <- left_join(variables, data_aggregated, by = "MOS11")
 ```
 
 ```{r}
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+
+```{r}
+variables <- data_join %>%
+  filter(Year == 2018) %>%
+  select(MOS11, Nom_Latin) %>%
+  na.omit()
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+```{r}
+variables <- data_join %>%
+  filter(Year == 2019) %>%
+  select(MOS11, Nom_Latin) %>%
+  na.omit()
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
 variables <- data_final %>%
   select(-Nom_Latin)
 variables_std <- scale(variables)
@@ -435,11 +483,40 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-
+```{r}
+variables <- data_join %>%
+  filter(Year == 2022) %>%
+  select(MOS11, Nom_Latin) %>%
+  na.omit()
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
 ```{r}
 variables <- data_join %>%
   filter(Year == 2023) %>%
   select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
+  na.omit()
+data_aggregated <- variables %>%
+  group_by(MOS11) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+data_final <- left_join(variables, data_aggregated, by = "MOS11")
+variables <- data_final %>%
+  select(-Nom_Latin)
+variables_std <- scale(variables)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+```{r}
+variables <- data_join %>%
+  filter(Year == 2023) %>%
+  select(MOS11, Nom_Latin) %>%
   na.omit()
 data_aggregated <- variables %>%
   group_by(MOS11) %>%

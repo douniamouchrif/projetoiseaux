@@ -763,7 +763,21 @@ ggplot(data = D_3_annees_filtre, aes(x = Année, y = D_3, group = Code_Maille, c
        y = "D_3") +
   theme_minimal() +
   theme(legend.position = "none")
+
+
+D_3_annees_filtre <- D_3_annees[D_3_annees$Code_Maille %in% sites_present_toutes_annees,]
+
+ggplot(data = D_3_annees_filtre, aes(x = D_3, fill = factor(Année))) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Distribution de l'indice D_3 par année",
+       x = "D_3",
+       y = "Densité") +
+  scale_fill_brewer(palette = "Set3") + 
+  theme_minimal() +
+  facet_wrap(~ Année)
 ```
+
+La distribution de l'indice de D3 (tous les sites qui revienent chque année). On peut le laisser et dire qu'on remarque que la distribution ne change pas au cours des années ou très très peu. 
 
 Graph "Nombre d'oiseaux par température"
 ```{r}

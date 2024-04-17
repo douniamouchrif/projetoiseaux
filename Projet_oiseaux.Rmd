@@ -710,7 +710,7 @@ On remarque que, entre 2018-2019 et 2022-2023, l'exponentielle de l'indice de Sh
 
 ```{r}
 resultats_D_2_v2 <- list()
-
+annees <- c(2018, 2019, 2022, 2023)
 for (annee in annees) {
   proportions_oiseaux <- proportion(Oiseaux, annee)
   D_2_oiseaux <- exp_shannon(proportions_oiseaux)

@@ -705,30 +705,33 @@ D_2_ER
 D_3_ER
 ```
 
+Pour les graphes suivants, nous choisissons de représenter nos valeurs seulement en fonction des sites présents sur toutes les années.
+
 ## Graphe : Indice de Shannon
 ```{r}
-annees <- c(2018, 2019, 2022, 2023)
 resultats_D_2_v1 <- list()
-
+annees <- c(2018, 2019, 2022, 2023)
 for (annee in annees) {
   proportions_oiseaux <- proportion(Oiseaux, annee)
   D_2_oiseaux <- exp_shannon(proportions_oiseaux)
   moyenne_D_2 <- mean(D_2_oiseaux$D_2)
-  resultats_D_2_v1[[as.character(annee)]] <- moyenne_D_2
+  resultats_D_2_v1[[as.character(annee)]] <- D_2_oiseaux
 }
 
-resultats_df <- data.frame(Année = as.integer(names(resultats_D_2_v1)), Moyenne_D_2 = unlist(resultats_D_2_v1))
+code_maille_presentes <- Reduce(intersect, lapply(resultats_D_2_v1, function(x) x$Code_Maille))
+resultats_filtres <- lapply(resultats_D_2_v1, function(x) x[x$Code_Maille %in% code_maille_presentes, ])
+resultats_moyenne <- lapply(resultats_filtres, function(x) mean(x$D_2))
+resultats_df <- data.frame(Année = as.integer(names(resultats_moyenne)), Moyenne_D_2 = unlist(resultats_moyenne))
 
 ggplot(data = resultats_df, aes(x = Année, y = Moyenne_D_2)) +
-  geom_line(color = "pink", size = 1.5) +  # Ligne rose
+  geom_line(color = "pink", size = 1.5) +
   geom_point() +
   labs(title = "Évolution de la moyenne de D_2_oiseaux par année",
        x = "Année",
        y = "Moyenne de D_2_oiseaux") +
   theme_minimal()
 ```
-On remarque que, entre 2018-2019 et 2022-2023, l'exponentielle de l'indice de Shannon diminue d'environ 0.5/1.0 en moyenne, ce qui reste très léger. Finalement, celui-ci reste assez constant au fil des années.
-## chercher ce que ça signifique quand ça diminue
+On remarque que, entre 2018, 2019 et 2022, l'exponentielle de l'indice de Shannon diminue varie entre 20.20 et 20.75 en moyenne, ce qui est très léger. De 2022-2023, l'exponentielle de l'indice de Shannon diminue d'environ 1.0 en moyenne, ce qui reste aussi assez léger. Finalement, celui-ci reste assez constant au fil des années.
 
 ```{r}
 resultats_D_2_v2 <- list()

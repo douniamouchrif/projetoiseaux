@@ -799,14 +799,14 @@ centre_ville_latitude <- as.numeric(centre_ville_latitude)
 
 centres_villes$distance_centre_ville <- sqrt((centres_villes$X.y - centre_ville_longitude)^2 + (centres_villes$Y - centre_ville_latitude)^2)
 
-donnees_agregate_distance <- aggregate(Denombrement_min ~ distance_centre_ville, data = centres_villes, FUN = sum)
+donnees_agregate_distance <- aggregate(Nom_Latin ~ distance_centre_ville, data = centres_villes, FUN = function(x) length(unique(x)))
 
-ggplot(data = donnees_agregate_distance, aes(x = distance_centre_ville, y = Denombrement_min)) +
+ggplot(data = donnees_agregate_distance, aes(x = distance_centre_ville, y = Nom_Latin)) +
   geom_point(color = "grey") +
   geom_smooth(method = "auto", se = FALSE, color = "black") + 
   xlab("Distance par rapport au centre-ville") +
-  ylab("Nombre d'oiseaux") + 
-  ggtitle("Nombre d'oiseaux en fonction de la distance par rapport au centre-ville") +
+  ylab("Nombre d'espèces d'oiseaux") + 
+  ggtitle("Nombre d'espèces d'oiseaux en fonction de la distance par rapport au centre-ville") +
   theme_minimal()
 ```
 

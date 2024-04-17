@@ -821,7 +821,7 @@ donnees_agregate <- aggregate(Nom_Latin ~ Temperature, data = Oiseaux, FUN = fun
 
 plot(donnees_agregate$Temperature, donnees_agregate$Nom_Latin, type = "b", 
      xlab = "Température (°C)", ylab = "Nombre d'oiseaux",
-     main = "Nombre d'oiseaux par température",
+     main = "Nombre d'espèces par température",
      col = "blue", pch = 19)
 ```
 

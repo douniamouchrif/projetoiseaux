@@ -891,14 +891,57 @@ ggplot(data = donnees_agregate2, aes(x = MOS11, y = Nom_Latin, color = Milieu_fa
 
 ## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par température
 ```{r}
-result <- Oiseaux %>%
+temp_2018 <- Oiseaux %>%
+  filter(Year == 2018) %>%
   group_by(Temperature, Nom_Latin) %>%
   summarise(Total = sum(Denombrement_min)) %>%
-  slice(which.max(Total)) 
+  slice(which.max(Total))
 
-ggplot(result, aes(x = Temperature, y = Total, fill = Nom_Latin)) +
+temp_2019 <- Oiseaux %>%
+  filter(Year == 2019) %>%
+  group_by(Temperature, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total))
+
+temp_2022 <- Oiseaux %>%
+  filter(Year == 2022) %>%
+  group_by(Temperature, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total))
+
+temp_2023 <- Oiseaux %>%
+  filter(Year == 2023) %>%
+  group_by(Temperature, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total))
+
+ggplot(temp_2018, aes(x = Temperature, y = Total, fill = Nom_Latin)) +
   geom_bar(stat = "identity") +
-  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente par température",
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2018 par température",
+       x = "Température (°C)",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+
+ggplot(temp_2019, aes(x = Temperature, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2019 par température",
+       x = "Température (°C)",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+
+ggplot(temp_2022, aes(x = Temperature, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2022 par température",
+       x = "Température (°C)",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+
+ggplot(temp_2023, aes(x = Temperature, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2023 par température",
        x = "Température (°C)",
        y = "Nombre total d'oiseaux de l'espèce la plus présente",
        fill = "Nom Latin") +
@@ -909,14 +952,57 @@ C'est pourquoi le "Passer domesticus" est présent tout le long de l'année en g
 
 ## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par intensité du vent
 ```{r}
-result2 <- Oiseaux %>%
+vent_2018 <- Oiseaux %>%
+  filter(Year == 2018) %>%
   group_by(Vent, Nom_Latin) %>%
   summarise(Total = sum(Denombrement_min)) %>%
-  slice(which.max(Total)) 
+  slice(which.max(Total))
 
-ggplot(result2, aes(x = Vent, y = Total, fill = Nom_Latin)) +
+vent_2019 <- Oiseaux %>%
+  filter(Year == 2019) %>%
+  group_by(Vent, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total))
+
+vent_2022 <- Oiseaux %>%
+  filter(Year == 2022) %>%
+  group_by(Vent, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total))
+
+vent_2023 <- Oiseaux %>%
+  filter(Year == 2023) %>%
+  group_by(Vent, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total))
+
+ggplot(vent_2018, aes(x = Vent, y = Total, fill = Nom_Latin)) +
   geom_bar(stat = "identity") +
-  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente par intensité du vent",
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2018 par intensité du vent",
+       x = "Intensité du vent",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+
+ggplot(vent_2019, aes(x = Vent, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2019 par intensité du vent",
+       x = "Intensité du vent",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+
+ggplot(vent_2022, aes(x = Vent, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2022 par intensité du vent",
+       x = "Intensité du vent",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+
+ggplot(vent_2023, aes(x = Vent, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2023 par intensité du vent",
        x = "Intensité du vent",
        y = "Nombre total d'oiseaux de l'espèce la plus présente",
        fill = "Nom Latin") +
@@ -925,14 +1011,57 @@ ggplot(result2, aes(x = Vent, y = Total, fill = Nom_Latin)) +
 
 ## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par couverture nuageuse
 ```{r}
-result3 <- Oiseaux %>%
+nuage_2018 <- Oiseaux %>%
+  filter(Year == 2018) %>%
   group_by(Couvert_Nuageux, Nom_Latin) %>%
   summarise(Total = sum(Denombrement_min)) %>%
-  slice(which.max(Total)) 
+  slice(which.max(Total))
 
-ggplot(result3, aes(x = Couvert_Nuageux, y = Total, fill = Nom_Latin)) +
+nuage_2019 <- Oiseaux %>%
+  filter(Year == 2019) %>%
+  group_by(Couvert_Nuageux, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total))
+
+nuage_2022 <- Oiseaux %>%
+  filter(Year == 2022) %>%
+  group_by(Couvert_Nuageux, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total))
+
+nuage_2023 <- Oiseaux %>%
+  filter(Year == 2023) %>%
+  group_by(Couvert_Nuageux, Nom_Latin) %>%
+  summarise(Total = sum(Denombrement_min)) %>%
+  slice(which.max(Total))
+
+ggplot(nuage_2018, aes(x = Couvert_Nuageux, y = Total, fill = Nom_Latin)) +
   geom_bar(stat = "identity") +
-  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente par couverture nuageuse",
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2018 par couverture nuageuse",
+       x = "Couverture nuageuse",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+
+ggplot(nuage_2019, aes(x = Couvert_Nuageux, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2019 par couverture nuageuse",
+       x = "Couverture nuageuse",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+
+ggplot(nuage_2022, aes(x = Couvert_Nuageux, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2022 par couverture nuageuse",
+       x = "Couverture nuageuse",
+       y = "Nombre total d'oiseaux de l'espèce la plus présente",
+       fill = "Nom Latin") +
+  theme_minimal()
+
+ggplot(nuage_2023, aes(x = Couvert_Nuageux, y = Total, fill = Nom_Latin)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Nombre d'oiseaux dont l'espèce est la plus présente en 2023 par couverture nuageuse",
        x = "Couverture nuageuse",
        y = "Nombre total d'oiseaux de l'espèce la plus présente",
        fill = "Nom Latin") +

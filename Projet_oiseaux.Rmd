@@ -835,6 +835,17 @@ ggplot(data = D_2_annees_filtre, aes(x = D_2, fill = factor(Année))) +
   facet_wrap(~ Année)
 ```
 
+```{r}
+data_D2_join <- D_2_annees_filtre %>% left_join(y = Land_cartoISea, by = c("Code_Maille" = "ID"))
+
+ggplot(data = data_D2_join, aes(x = MOS11, y = D_2, color = Année)) +
+  geom_point() +
+  geom_smooth(method = "auto", se = TRUE, color = "black") +
+  labs(x = "Surfaces artificialisées en % (MOS11)",
+       y = "indice D2",
+       title = "Indice de diversité D2 en fonction du pourcentage d'artificialisation")
+```
+
 ## Graphe : Indice de Simpson
 ```{r}
 resultats_D_3 <- list()
@@ -877,6 +888,17 @@ ggplot(data = D_3_annees_filtre, aes(x = D_3, fill = factor(Année))) +
 ```
 
 La distribution de l'indice de D3 (tous les sites qui revienent chque année). On peut le laisser et dire qu'on remarque que la distribution ne change pas au cours des années ou très très peu. 
+
+```{r}
+data_D3_join <- D_3_annees_filtre %>% left_join(y = Land_cartoISea, by = c("Code_Maille" = "ID"))
+
+ggplot(data = data_D3_join, aes(x = MOS11, y = D_3, color = Année)) +
+  geom_point() +
+  geom_smooth(method = "auto", se = TRUE, color = "black") +
+  labs(x = "Surfaces artificialisées en % (MOS11)",
+       y = "indice D3",
+       title = "Indice de diversité D3 en fonction du pourcentage d'artificialisation")
+```
 
 Biodiversité -> diversité d'espèces
 Il faut se concentrer sur la diversité d'espèces et pas sur les nombres donc le dernier graph

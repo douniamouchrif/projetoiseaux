@@ -878,16 +878,6 @@ ggplot(data = D_3_annees_filtre, aes(x = D_3, fill = factor(Année))) +
 
 La distribution de l'indice de D3 (tous les sites qui revienent chque année). On peut le laisser et dire qu'on remarque que la distribution ne change pas au cours des années ou très très peu. 
 
-Graph "Nombre d'oiseaux par température"
-```{r}
-donnees_agregate <- aggregate(Nom_Latin ~ Temperature, data = Oiseaux, FUN = function(x) length(unique(x)))
-
-plot(donnees_agregate$Temperature, donnees_agregate$Nom_Latin, type = "b", 
-     xlab = "Température (°C)", ylab = "Nombre d'oiseaux",
-     main = "Nombre d'espèces par température",
-     col = "blue", pch = 19)
-```
-
 Biodiversité -> diversité d'espèces
 Il faut se concentrer sur la diversité d'espèces et pas sur les nombres donc le dernier graph
 Corrélation par point entre le nombre d'espèce et le % d'artificialisation -> chaque point correspond à une espèce
@@ -898,7 +888,6 @@ Le faire année par année : 2018-2023 ça va changer ?? si ça change ca veut d
 Une ACP : essayer de voir si vraiment la variabilité du nombre d'espèces est expliqué par l'artificialisation ou si elle peut être expliquée par d'autres variables ambiantes.
 Calculer simpson pour les 4 années
 Richesse/shannon : nombre d'espèces présentes, calculer en fonction du mos/taille du buffer à 500 -> quelle est l'occupation du sol ou la diversité/richesse est la plus importante ? Normalement c'est dans les forêts qu'on aura une plus grande diversité comparée aux surfaces artificialisées. 
-
 
 ```{r}
 data_join_1 <- Oiseaux %>% 
@@ -952,7 +941,17 @@ ggplot(data = donnees_agregate2, aes(x = MOS11, y = Nom_Latin, color = Milieu_fa
   theme_minimal()
 ```
 
-## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par température
+## Graphe "Nombre d'oiseaux par température"
+```{r}
+donnees_agregate <- aggregate(Nom_Latin ~ Temperature, data = Oiseaux, FUN = function(x) length(unique(x)))
+
+plot(donnees_agregate$Temperature, donnees_agregate$Nom_Latin, type = "b", 
+     xlab = "Température (°C)", ylab = "Nombre d'oiseaux",
+     main = "Nombre d'espèces par température",
+     col = "blue", pch = 19)
+```
+
+## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par température et par année
 ```{r}
 temp_2018 <- Oiseaux %>%
   filter(Year == 2018) %>%

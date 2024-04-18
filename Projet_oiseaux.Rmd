@@ -996,7 +996,7 @@ data_join_2$X.y <- as.numeric(data_join_2$X.y)
 
 donnees_agregate <- aggregate(Nom_Latin ~ Nom_lieu + X.y + Y + BufferSize + name_site, data = data_join_2, FUN = function(x) length(unique(x)))
 
-palette <- colorNumeric(palette = "magma", domain = donnees_agregate$Nom_Latin,reverse = TRUE)
+palette <- colorNumeric(palette = "viridis", domain = donnees_agregate$Nom_Latin,reverse = TRUE)
 
 amp_oiseaux <- leaflet(data = donnees_agregate) %>% 
   addTiles() %>%
@@ -1006,19 +1006,31 @@ amp_oiseaux <- amp_oiseaux %>% addLegend(position = "bottomright", pal = palette
 amp_oiseaux
 ```
 
-
-
 Interesant d'etudier MOS 4 et 5. Faire une ACP aussi sur ces variables.
 ## ACP sur les variables MOS et le nombre d’espèces d’oiseaux
 ```{r}
 Land_cartoISea_500 <- Land_cartoISea %>%
   filter(BufferSize == 500)
 
-data_join <- Oiseaux %>% 
+data_join <- Oiseaux %>%
   left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID"))
 
-data_join <- data_join %>% 
+data_join <- data_join %>%
   left_join(Sites, by = c("Code_Maille" = "code_site"))
+
+
+centre_ville_interet <- data_join[data_join$name_site == "Bordeaux-A", ]
+
+centre_ville_latitude <- data_join$X.y[data_join$name_site == "Bordeaux-A"]
+centre_ville_longitude <- data_join$Y[data_join$name_site == "Bordeaux-A"]
+
+centre_ville_latitude <- centre_ville_latitude[1]
+centre_ville_longitude <- centre_ville_longitude[1]
+
+data_join$Y <- as.numeric(data_join$Y)
+centre_ville_latitude <- as.numeric(centre_ville_latitude)
+
+data_join$distance_centre_ville <- sqrt((data_join$X.y - centre_ville_longitude)^2 + (data_join$Y - centre_ville_latitude)^2)
 
 data_aggregated <- data_join %>%
   group_by(name_site) %>%
@@ -1026,7 +1038,7 @@ data_aggregated <- data_join %>%
 
 data_final <- left_join(data_join, data_aggregated, by = "name_site")
 
-data_acp <- data_final[, c("Nb_espece", paste0("MOS", 1:14))]
+data_acp <- data_final[, c("Nb_espece", "distance_centre_ville", paste0("MOS", 1:14))]
 
 data_acp_clean <- data_acp[, apply(data_acp, 2, function(x) !all(is.na(x)) & length(unique(x)) > 1)]
 
@@ -1056,4 +1068,3 @@ amp_artificial <- amp_artificial %>% addLegend(position = "bottomright", pal = p
 
 amp_artificial
 ```
-

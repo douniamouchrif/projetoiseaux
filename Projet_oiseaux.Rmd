@@ -93,7 +93,46 @@ ggplot(top3_species, aes(x = factor(Year), y = Total, fill = Nom_Latin)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~Year, scales = "free_x")
 ```
+```{r}
+Traits$Milieu_favori[Traits$Nom.latin == 'Columba palumbus']
+Traits$Milieu_favori[Traits$Nom.latin == 'Parus major']
+Traits$Milieu_favori[Traits$Nom.latin == 'Passer domesticus']
+Traits$Milieu_favori[Traits$Nom.latin == 'Sturnus vulgaris']
+Traits$Milieu_favori[Traits$Nom.latin == 'Sylvia atricapilla']
+Traits$Milieu_favori[Traits$Nom.latin == 'Turdus merula']
+```
+On voit que, parmis les espèces d'oiseaux figurant dans le top 3 de chaque année, chaque espèce possède comme milieu favori un milieu "généraliste" à part l'espèce "Passer domesticus" dont son milieu favori est le milieu du "bâti".
 
+```{r}
+Traits$Régime.alimentaire[Traits$Nom.latin == 'Columba palumbus']
+Traits$Régime.alimentaire[Traits$Nom.latin == 'Parus major']
+Traits$Régime.alimentaire[Traits$Nom.latin == 'Passer domesticus']
+Traits$Régime.alimentaire[Traits$Nom.latin == 'Sturnus vulgaris']
+Traits$Régime.alimentaire[Traits$Nom.latin == 'Sylvia atricapilla']
+Traits$Régime.alimentaire[Traits$Nom.latin == 'Turdus merula']
+```
+Concernant le régime alimentaire de ces espèces, il varie entre un régime mixte, végétarien et carnivore pour l'espèce "Parus major" figurant top 2 en 2019.
+
+```{r}
+Traits$Nidification[Traits$Nom.latin == 'Columba palumbus']
+Traits$Nidification[Traits$Nom.latin == 'Parus major']
+Traits$Nidification[Traits$Nom.latin == 'Passer domesticus']
+Traits$Nidification[Traits$Nom.latin == 'Sturnus vulgaris']
+Traits$Nidification[Traits$Nom.latin == 'Sylvia atricapilla']
+Traits$Nidification[Traits$Nom.latin == 'Turdus merula']
+```
+Du côté de la nidification, celle ci varie entre "cavité", "buisson", et "arbre" pour l'espèce "Columba palumbus". Notons que les espèces figurant top 1 sur les 4 années, à savoir l'espèce "Passer domesticus" et l'espèce "Sturnus vulgaris", ont tous deux le même lieu de nidification : "cavité".
+
+```{r}
+Traits$Statut.de.protection[Traits$Nom.latin == 'Columba palumbus']
+Traits$Statut.de.protection[Traits$Nom.latin == 'Parus major']
+Traits$Statut.de.protection[Traits$Nom.latin == 'Passer domesticus']
+Traits$Statut.de.protection[Traits$Nom.latin == 'Sturnus vulgaris']
+Traits$Statut.de.protection[Traits$Nom.latin == 'Sylvia atricapilla']
+Traits$Statut.de.protection[Traits$Nom.latin == 'Turdus merula']
+```
+Pour finir, la moitié des espèces figurant dans le top 3 des 4 années sont sous protection, et l'autre moitié ne l'est pas. 
+Notons que la France est le pays de l'UE qui chasse le plus grand nombre d'espèces d'oiseaux, dont un total de 20 espèces qui sont de plus, menacées de disparition. (source : https://www.lpo.fr/decouvrir-la-nature/conseils-biodiversite/conseils-biodiversite/juridique/oiseaux-menaces-et-chasses-en-france#:~:text=La%20Directive%20Oiseaux%2C%20dont%20la,membres%20de%20l'Union%20Européenne)
 
 ## 1ere question : 
 

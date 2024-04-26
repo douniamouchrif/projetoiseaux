@@ -1221,7 +1221,7 @@ amp_oiseaux <- amp_oiseaux %>% addLegend(position = "bottomright", pal = palette
 amp_oiseaux
 ```
 
-Carte nombre de oiseaux et leur milieu favori
+Carte nombre et repartition des oiseaux en fonction de leur milieu favori
 ```{r}
 data_join_1 <- Oiseaux %>%
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
@@ -1268,6 +1268,56 @@ ma_carte <- ma_carte %>%
     lat = chart_data$lat,
     type = "pie",
     chartdata = chart_data[, unique(aggregated_data$Milieu_favori)],
+    colorPalette = colors,
+    width = 60 * sqrt(chart_data$total) / sqrt(max(chart_data$total)),
+    transitionTime = 0
+  )
+
+ma_carte
+```
+
+Carte nombre et repartition des oiseaux en fonction de leur regime alimentaire
+```{r}
+data_join_1 <- Oiseaux %>%
+  left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
+
+Land_cartoISea_500 <- Land_cartoISea %>%
+  filter(BufferSize == 500)
+
+data_join_2 <- data_join_1 %>%
+  left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID")) %>%
+  left_join(Sites, by = c("Code_Maille" = "code_site"))
+
+aggregated_data <- data_join_2 %>%
+  group_by(X.x, Y, Year, name_site, Régime.alimentaire) %>%
+  summarise(Nom_Latin = n_distinct(Nom_Latin)) %>%
+  ungroup() %>%
+  mutate(Year = factor(Year))
+
+aggregated_data <- aggregated_data[!is.na(aggregated_data$Régime.alimentaire), ]
+
+chartdata <- table(aggregated_data$X.x, aggregated_data$Y, aggregated_data$Régime.alimentaire)
+
+colors <- c("yellow", "green", "grey", "brown", "blue")
+
+pivot_data <- spread(aggregated_data, Régime.alimentaire, Nom_Latin, fill = 0)
+
+pivot_data$total <- rowSums(select(pivot_data, -c(X.x, Y, Year, name_site)))
+
+chart_data <- cbind(pivot_data[, c("X.x", "Y")], pivot_data[, unique(aggregated_data$Régime.alimentaire)], total = pivot_data$total)
+
+colnames(chart_data) <- c("lng", "lat", unique(aggregated_data$Régime.alimentaire), "total")
+
+ma_carte <- leaflet() %>%
+  addTiles() %>%
+  setView(lng = mean(pivot_data$X.x), lat = mean(pivot_data$Y), zoom = 10)
+
+ma_carte <- ma_carte %>%
+  addMinicharts(
+    lng = chart_data$lng,
+    lat = chart_data$lat,
+    type = "pie",
+    chartdata = chart_data[, unique(aggregated_data$Régime.alimentaire)],
     colorPalette = colors,
     width = 60 * sqrt(chart_data$total) / sqrt(max(chart_data$total)),
     transitionTime = 0

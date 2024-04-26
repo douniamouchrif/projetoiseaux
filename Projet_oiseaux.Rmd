@@ -1221,7 +1221,7 @@ amp_oiseaux <- amp_oiseaux %>% addLegend(position = "bottomright", pal = palette
 amp_oiseaux
 ```
 
-Carte nombre de oieseux et leur milieu favori
+Carte nombre de oiseaux et leur milieu favori
 ```{r}
 data_join_1 <- Oiseaux %>%
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
@@ -1233,28 +1233,26 @@ data_join_2 <- data_join_1 %>%
   left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID")) %>%
   left_join(Sites, by = c("Code_Maille" = "code_site"))
 
-data_join_2 <- data_join_2 %>%
+aggregated_data <- data_join_2 %>%
   group_by(X.x, Y, Year, Milieu_favori, name_site) %>%
   summarise(Nom_Latin = n_distinct(Nom_Latin)) %>%
   ungroup() %>%
   mutate(Year = factor(Year))
 
-aggregated_data <- data_join_2 %>%
-  group_by(X.x, Y, Milieu_favori) %>%
-  summarise(count = n()) %>%
-  ungroup()
-
 chartdata <- table(aggregated_data$X.x, aggregated_data$Y, aggregated_data$Milieu_favori)
 
 colors <- c("yellow", "green", "grey", "brown", "blue")
 
-pivot_data <- spread(aggregated_data, Milieu_favori, count, fill = 0)
+pivot_data <- spread(aggregated_data, Milieu_favori, Nom_Latin, fill = 0)
 
 aggregated_data <- na.omit(aggregated_data)
 
-pivot_data <- spread(aggregated_data, Milieu_favori, count, fill = 0)
+pivot_data <- spread(aggregated_data, Milieu_favori, Nom_Latin, fill = 0)
 
-pivot_data$total <- rowSums(select(pivot_data, -X.x, -Y))
+pivot_data <- pivot_data %>%
+  ungroup()
+
+pivot_data$total <- rowSums(select(pivot_data, -c(X.x, Y, Year, name_site)))
 
 chart_data <- cbind(pivot_data[, c("X.x", "Y")], pivot_data[, unique(aggregated_data$Milieu_favori)], total = pivot_data$total)
 
@@ -1278,7 +1276,7 @@ ma_carte <- ma_carte %>%
 ma_carte
 ```
 
-Histogramme nombre de oiseaux pour chaque regime alimentaire en fonction du milieu favori 
+Histogramme Distribution de MOS11 par Milieu Favori et Régime Alimentaire
 ```{r}
 data_join_1 <- Oiseaux %>% 
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))

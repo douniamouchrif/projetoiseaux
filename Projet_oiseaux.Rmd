@@ -26,6 +26,8 @@ date: "2024-02-19"
 library(dplyr)
 library(sp)
 library(leaflet)
+library(leaflet.extras)
+library(leaflet.minicharts)
 library(ggplot2)
 library(FactoMineR)
 ```
@@ -1219,4 +1221,102 @@ amp_oiseaux <- amp_oiseaux %>% addLegend(position = "bottomright", pal = palette
 amp_oiseaux
 ```
 
+Carte nombre de oieseux et leur milieu favori
+```{r}
+data_join_1 <- Oiseaux %>%
+  left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
 
+Land_cartoISea_500 <- Land_cartoISea %>%
+  filter(BufferSize == 500)
+
+data_join_2 <- data_join_1 %>%
+  left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID")) %>%
+  left_join(Sites, by = c("Code_Maille" = "code_site"))
+
+data_join_2 <- data_join_2 %>%
+  group_by(X.x, Y, Year, Milieu_favori, name_site) %>%
+  summarise(Nom_Latin = n_distinct(Nom_Latin)) %>%
+  ungroup() %>%
+  mutate(Year = factor(Year))
+
+aggregated_data <- data_join_2 %>%
+  group_by(X.x, Y, Milieu_favori) %>%
+  summarise(count = n()) %>%
+  ungroup()
+
+chartdata <- table(aggregated_data$X.x, aggregated_data$Y, aggregated_data$Milieu_favori)
+
+colors <- c("yellow", "green", "grey", "brown", "blue")
+
+pivot_data <- spread(aggregated_data, Milieu_favori, count, fill = 0)
+
+aggregated_data <- na.omit(aggregated_data)
+
+pivot_data <- spread(aggregated_data, Milieu_favori, count, fill = 0)
+
+pivot_data$total <- rowSums(select(pivot_data, -X.x, -Y))
+
+chart_data <- cbind(pivot_data[, c("X.x", "Y")], pivot_data[, unique(aggregated_data$Milieu_favori)], total = pivot_data$total)
+
+colnames(chart_data) <- c("lng", "lat", unique(aggregated_data$Milieu_favori), "total")
+
+ma_carte <- leaflet() %>%
+  addTiles() %>%
+  setView(lng = mean(pivot_data$X.x), lat = mean(pivot_data$Y), zoom = 10)
+
+ma_carte <- ma_carte %>%
+  addMinicharts(
+    lng = chart_data$lng,
+    lat = chart_data$lat,
+    type = "pie",
+    chartdata = chart_data[, unique(aggregated_data$Milieu_favori)],
+    colorPalette = colors,
+    width = 60 * sqrt(chart_data$total) / sqrt(max(chart_data$total)),
+    transitionTime = 0
+  )
+
+ma_carte
+```
+
+Histogramme nombre de oiseaux pour chaque regime alimentaire en fonction du milieu favori 
+```{r}
+data_join_1 <- Oiseaux %>% 
+  left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
+
+Land_cartoISea_500 <- Land_cartoISea %>%
+  filter(BufferSize == 500)
+
+data_join_2 <- data_join_1 %>%
+  left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID"))
+
+donnees_agregate2 <- aggregate(Nom_Latin ~ X + Y + MOS11 + Year + Milieu_favori + Régime.alimentaire, data = data_join_2, FUN = function(x) length(unique(x)))
+
+donnees_agregate2$Year <- factor(donnees_agregate2$Year)
+donnees_agregate2
+
+ggplot(data = donnees_agregate2, aes(x = Milieu_favori, y = MOS11, fill = Régime.alimentaire)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Milieu Favori", y = "MOS11", fill = "Régime Alimentaire") +
+  ggtitle("Distribution de MOS11 par Milieu Favori et Régime Alimentaire")
+```
+
+ANOVA
+```{r}
+anova_model <- aov(MOS11 ~ Milieu_favori * Régime.alimentaire, data = donnees_agregate2)
+summary(anova_model)
+```
+
+Les résultats de l'analyse de variance (ANOVA) indiquent que la variable MOS11 présente des différences significatives en fonction de Milieu_favori (p = 0.00370) et de l'interaction entre Milieu_favori et Régime.alimentaire (p = 0.00768). Cela signifie qu'il existe des variations significatives de MOS11 entre les différents niveaux de Milieu_favori et que cette relation est influencée par Régime.alimentaire.
+
+Cependant, la variable Régime.alimentaire seule n'a pas un effet significatif sur MOS11 (p = 0.74679).
+
+En résumé, les résultats suggèrent que Milieu_favori et l'interaction entre Milieu_favori et Régime.alimentaire ont un impact significatif sur MOS11, tandis que Régime.alimentaire seul n'a pas un effet significatif.
+
+
+MODELE LINAIRE
+```{r}
+lm_model <- lm(MOS11 ~ Milieu_favori * Régime.alimentaire, data = donnees_agregate2)
+summary(lm_model)
+```
+
+Dans l'ensemble, le modèle semble avoir une faible capacité prédictive, comme en témoigne le faible coefficient de détermination multiple ajusté (Adjusted R-squared) de 0.02455. Cela signifie que les variables incluses dans le modèle n'expliquent qu'une petite proportion de la variance de MOS11.

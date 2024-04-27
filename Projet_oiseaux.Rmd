@@ -30,6 +30,7 @@ library(leaflet.extras)
 library(leaflet.minicharts)
 library(ggplot2)
 library(FactoMineR)
+library(tidyr)
 ```
 
 ```{r setup, include=FALSE}

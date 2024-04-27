@@ -44,7 +44,7 @@ Traits <- read.csv("Data/traits-statut-IUCN-biodivercite.csv", header = TRUE, se
 ```
 
 ```{r}
-head(Sites)
+Sites
 ```
 
 ```{r}
@@ -53,15 +53,15 @@ nrow(Land_cartoISea)
 Pour chaque point on a 5 tailles de buffer --> 53x5
 
 ```{r}
-head(Land_cartoISea)
+Land_cartoISea
 ```
 
 ```{r}
-head(Oiseaux)
+Oiseaux
 ```
 
 ```{r}
-head(Traits)
+Traits
 ```
 
 ```{r}
@@ -95,7 +95,7 @@ ggplot(top3_species, aes(x = factor(Year), y = Total, fill = Nom_Latin)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~Year, scales = "free_x")
 ```
-On remarque que l'espèce d'oiseaux la plus présente sur les années 2018 et 2019 est le "Sturnus Vulgaris", et la plus présente sur les années 2022 et 2023 est le "Passer Domesticus". Observons de plus près leur traits spécifiques, ainsi qu'aux autres espèces figurant dans les top 3 de ces 4 années.
+On remarque que l'espèce d'oiseaux la plus présente sur les années 2018 et 2019 est le "Sturnus Vulgaris", et la plus présente sur les années 2022 et 2023 est le "Passer Domesticus". Observons de plus près leurs traits spécifiques, ainsi qu'aux autres espèces figurant dans les top 3 de ces 4 années.
 
 ```{r}
 Traits$Milieu_favori[Traits$Nom.latin == 'Columba palumbus']

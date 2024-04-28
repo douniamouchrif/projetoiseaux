@@ -918,8 +918,7 @@ Pour les graphes suivants, nous choisissons de représenter nos valeurs seulemen
 ## Graphe : Indice de Shannon
 ```{r}
 resultats_D_2_v1 <- list()
-annees <- c(2018, 2019, 2022, 2023)
-for (annee in annees) {
+for (annee in years) {
   proportions_oiseaux <- proportion(Oiseaux, annee)
   D_2_oiseaux <- exp_shannon(proportions_oiseaux)
   moyenne_D_2 <- mean(D_2_oiseaux$D_2)
@@ -929,9 +928,9 @@ for (annee in annees) {
 code_maille_presentes <- Reduce(intersect, lapply(resultats_D_2_v1, function(x) x$Code_Maille))
 resultats_filtres <- lapply(resultats_D_2_v1, function(x) x[x$Code_Maille %in% code_maille_presentes, ])
 resultats_moyenne <- lapply(resultats_filtres, function(x) mean(x$D_2))
-resultats_df <- data.frame(Année = as.integer(names(resultats_moyenne)), Moyenne_D_2 = unlist(resultats_moyenne))
+resultats_df_D_2 <- data.frame(Année = as.integer(names(resultats_moyenne)), Moyenne_D_2 = unlist(resultats_moyenne))
 
-ggplot(data = resultats_df, aes(x = Année, y = Moyenne_D_2)) +
+ggplot(data = resultats_df_D_2, aes(x = Année, y = Moyenne_D_2)) +
   geom_line(color = "pink", size = 1.5) +
   geom_point() +
   labs(title = "Évolution de la moyenne de D_2_oiseaux par année",
@@ -943,8 +942,7 @@ On remarque que, entre 2018, 2019 et 2022, l'exponentielle de l'indice de Shanno
 
 ```{r}
 resultats_D_2_v2 <- list()
-annees <- c(2018, 2019, 2022, 2023)
-for (annee in annees) {
+for (annee in years) {
   proportions_oiseaux <- proportion(Oiseaux, annee)
   D_2_oiseaux <- exp_shannon(proportions_oiseaux)
   D_2_oiseaux$Année <- as.integer(annee)
@@ -993,16 +991,39 @@ ggplot(data = data_D2_join, aes(x = MOS11, y = D_2, color = Année)) +
 
 ## Graphe : Indice de Simpson
 ```{r}
-resultats_D_3 <- list()
-annees <- c(2018, 2019, 2022, 2023)
-for (annee in annees) {
+resultats_D_3_v1 <- list()
+for (annee in years) {
+  proportions_oiseaux <- proportion(Oiseaux, annee)
+  D_3_oiseaux <- proba_simpson(proportions_oiseaux)
+  moyenne_D_3 <- mean(D_3_oiseaux$D_3)
+  resultats_D_3_v1[[as.character(annee)]] <- D_3_oiseaux
+}
+
+code_maille_presentes <- Reduce(intersect, lapply(resultats_D_3_v1, function(x) x$Code_Maille))
+resultats_filtres <- lapply(resultats_D_3_v1, function(x) x[x$Code_Maille %in% code_maille_presentes, ])
+resultats_moyenne <- lapply(resultats_filtres, function(x) mean(x$D_3))
+resultats_df_D_3 <- data.frame(Année = as.integer(names(resultats_moyenne)), Moyenne_D_3 = unlist(resultats_moyenne))
+
+ggplot(data = resultats_df_D_3, aes(x = Année, y = Moyenne_D_3)) +
+  geom_line(color = "pink", size = 1.5) +
+  geom_point() +
+  labs(title = "Évolution de la moyenne de D_3_oiseaux par année",
+       x = "Année",
+       y = "Moyenne de D_3_oiseaux") +
+  theme_minimal()
+```
+On remarque que, entre 2018 et 2019, l'indice de Simpson diminue d'environ 0.5, puis augmente d'environ 0.8 en 2022, ce qui reste des variations moyennes assez légères. De 2022 à 2023, l'indice de Simpson diminue d'environ 1.2 en moyenne, ce qui reste aussi assez léger. Finalement, l'indice de Simpson reste, lui aussi, assez constant au fil des années.
+
+```{r}
+resultats_D_3_v2 <- list()
+for (annee in years) {
   proportions_oiseaux <- proportion(Oiseaux, annee)
   D_3_oiseaux <- proba_simpson(proportions_oiseaux)
   D_3_oiseaux$Année <- as.integer(annee)
-  resultats_D_3[[as.character(annee)]] <- D_3_oiseaux
+  resultats_D_3_v2[[as.character(annee)]] <- D_3_oiseaux
 }
 
-D_3_annees <- do.call(rbind, resultats_D_3)
+D_3_annees <- do.call(rbind, resultats_D_3_v2)
 D_3_annees$Année <- factor(D_3_annees$Année)
 
 #filtrer les sites présents sur toutes les années

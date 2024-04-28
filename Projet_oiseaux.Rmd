@@ -21,7 +21,7 @@ title: "Projet oiseaux"
 output: html_document
 date: "2024-02-19"
 ---
-
+# Imports
 ```{r}
 library(dplyr)
 library(sp)
@@ -37,6 +37,7 @@ library(tidyr)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Données
 ```{r}
 Sites <- read.csv("Data/BiodiverCite_sites.csv", header = TRUE, sep = ";")
 Land_cartoISea <- read.csv("Data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
@@ -75,6 +76,8 @@ print(Oiseaux)
 #renommer la 4éme colonne
 names(Traits)[4] = "Milieu_favori"
 ```
+
+# Statistiques descriptives
 
 ## Top 3 des espèces d'oiseaux la plus présente selon l'année
 
@@ -139,7 +142,23 @@ Traits$Statut.de.protection[Traits$Nom.latin == 'Turdus merula']
 Pour finir, la moitié des espèces figurant dans le top 3 des 4 années sont sous protection, et l'autre moitié ne l'est pas. 
 Notons que la France est le pays de l'UE qui chasse le plus grand nombre d'espèces d'oiseaux, dont un total de 20 espèces qui sont de plus, menacées de disparition. (source : https://www.lpo.fr/decouvrir-la-nature/conseils-biodiversite/conseils-biodiversite/juridique/oiseaux-menaces-et-chasses-en-france#:~:text=La%20Directive%20Oiseaux%2C%20dont%20la,membres%20de%20l'Union%20Européenne)
 
-## 1ere question : 
+## Boxplots
+```{r}
+boxplot_oiseaux <- Oiseaux %>%
+  group_by(Year, Nom_Latin) %>%
+  summarise(Total_Birds = sum(Denombrement_min))
+
+ggplot(boxplot_oiseaux, aes(x = factor(Year), y = Total_Birds)) +
+  geom_boxplot() +
+  labs(title = "Distribution du nombre d'oiseaux par espèce au fil des années",
+       x = "Année",
+       y = "Nombre total d'oiseaux") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+On remarque que la majeure partie des espèces au fil des années contient un nombre d'oiseaux entre 0 et 50 oiseaux par espèces. Cependant, quelques espèces comportent plus d'oiseaux que la majeure partie, allant jusqu'à 250 oiseaux par espèces enregistrés. Enfin, la médiane se trouve environ à la même valeur pour chaque année 2018, 2019, 2022 et 2023.
+
+# 1ere question : 
 
 Nous commençons par nous intéresser au buffer de taille 500m ce qui nous donnera un diamètre de 1km par rapport à chaque point.
 
@@ -676,12 +695,12 @@ tot_Milieu_favori
 Oiseaux_Tot <- sum(Oiseaux$Denombrement_min)
 ```
 
-## Formules de diversité
+# Formules de diversité
 
 i <- espece
 j <- site
 
-### Formule 1
+## Formule 1
 ```{r}
 proportion <- function(data, year) {
   data <- data[data$Year == year,]
@@ -698,7 +717,7 @@ proportion <- function(data, year) {
 }
 ```
 
-### Formule 2
+## Formule 2
 H_j = entropie (somme par site)
 ```{r}
 exp_shannon <- function(proportions) {
@@ -715,7 +734,7 @@ exp_shannon <- function(proportions) {
 }
 ```
 
-### Formule 3
+## Formule 3
 
 1 divisé par la proba que deux individus qu'on prend dans un ehcantillon soient de la meme espece, donc plus la proba augmente, plus D_3 va diminuer car la proba est au dénominateur
 
@@ -939,7 +958,7 @@ ggplot(data = donnees_agregate2, aes(x = MOS11, y = Nom_Latin, color = Régime.a
                      values = c("Carnivore" = "red", "Mixte" = "blue", "Végétarien" = "orange")) +
   theme_minimal()
 ```
-## Graphe "Diversité en fonction du nombre d'oiseaux et le degré d'artificialisation"
+# Graphe "Diversité en fonction du nombre d'oiseaux et le degré d'artificialisation"
 ```{r}
 data_join_1 <- Oiseaux %>% 
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
@@ -966,7 +985,7 @@ ggplot(data = donnees_agregate2, aes(x = MOS11, y = Nom_Latin, color = Milieu_fa
   theme_minimal()
 ```
 
-## Graphe "Nombre d'oiseaux par température"
+# Graphe "Nombre d'oiseaux par température"
 ```{r}
 donnees_agregate <- aggregate(Nom_Latin ~ Temperature, data = Oiseaux, FUN = function(x) length(unique(x)))
 
@@ -976,7 +995,7 @@ plot(donnees_agregate$Temperature, donnees_agregate$Nom_Latin, type = "b",
      col = "blue", pch = 19)
 ```
 
-## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par température et par année
+# Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par température et par année
 ```{r}
 temp_2018 <- Oiseaux %>%
   filter(Year == 2018) %>%
@@ -1037,7 +1056,7 @@ ggplot(temp_2023, aes(x = Temperature, y = Total, fill = Nom_Latin)) +
 "Le moineau domestique est un oiseau sédentaire. Cela signifie qu'il ne migre pas et vit toujours au même endroit. C'est donc un des rares oiseaux que tu peux encore observer en automne et en hiver."
 C'est pourquoi le "Passer domesticus" est présent tout le long de l'année en grand nombre.
 
-## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par intensité du vent
+# Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par intensité du vent
 ```{r}
 vent_2018 <- Oiseaux %>%
   filter(Year == 2018) %>%
@@ -1096,7 +1115,7 @@ ggplot(vent_2023, aes(x = Vent, y = Total, fill = Nom_Latin)) +
   theme_minimal()
 ```
 
-## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par couverture nuageuse
+# Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par couverture nuageuse
 ```{r}
 nuage_2018 <- Oiseaux %>%
   filter(Year == 2018) %>%
@@ -1155,9 +1174,9 @@ ggplot(nuage_2023, aes(x = Couvert_Nuageux, y = Total, fill = Nom_Latin)) +
   theme_minimal()
 ```
 
-## 4. Questions
+# 2eme question
 
-2) la forme de la relation est-elle similaire si on considère non plus l’imperméabilisation du sol mais plutôt la distance au centre ville, sachant que ces deux métriques sont corrélées? On pourra considérer Pey-Berland le centre ville et utiliser le package sf.
+La forme de la relation est-elle similaire si on considère non plus l’imperméabilisation du sol mais plutôt la distance au centre ville, sachant que ces deux métriques sont corrélées? On pourra considérer Pey-Berland le centre ville et utiliser le package sf.
 
 Nous avons pris comme point "centre-ville" le point "Bordeaux-A" car nous n'avons pas le point "Pey-Berland" dans nos données.
 ```{r}
@@ -1222,7 +1241,7 @@ amp_oiseaux <- amp_oiseaux %>% addLegend(position = "bottomright", pal = palette
 amp_oiseaux
 ```
 
-Carte nombre et repartition des oiseaux en fonction de leur milieu favori
+## Carte nombre et repartition des oiseaux en fonction de leur milieu favori
 ```{r}
 data_join_1 <- Oiseaux %>%
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
@@ -1277,7 +1296,7 @@ ma_carte <- ma_carte %>%
 ma_carte
 ```
 
-Carte nombre et repartition des oiseaux en fonction de leur regime alimentaire
+## Carte nombre et repartition des oiseaux en fonction de leur regime alimentaire
 ```{r}
 data_join_1 <- Oiseaux %>%
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
@@ -1327,7 +1346,7 @@ ma_carte <- ma_carte %>%
 ma_carte
 ```
 
-Histogramme Distribution de MOS11 par Milieu Favori et Régime Alimentaire
+## Histogramme Distribution de MOS11 par Milieu Favori et Régime Alimentaire
 ```{r}
 data_join_1 <- Oiseaux %>% 
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
@@ -1349,7 +1368,7 @@ ggplot(data = donnees_agregate2, aes(x = Milieu_favori, y = MOS11, fill = Régim
   ggtitle("Distribution de MOS11 par Milieu Favori et Régime Alimentaire")
 ```
 
-ANOVA
+## ANOVA
 ```{r}
 anova_model <- aov(MOS11 ~ Milieu_favori * Régime.alimentaire, data = donnees_agregate2)
 summary(anova_model)
@@ -1362,7 +1381,7 @@ Cependant, la variable Régime.alimentaire seule n'a pas un effet significatif s
 En résumé, les résultats suggèrent que Milieu_favori et l'interaction entre Milieu_favori et Régime.alimentaire ont un impact significatif sur MOS11, tandis que Régime.alimentaire seul n'a pas un effet significatif.
 
 
-MODELE LINEAIRE
+## MODELE LINEAIRE
 ```{r}
 lm_model <- lm(MOS11 ~ Milieu_favori * Régime.alimentaire, data = donnees_agregate2)
 summary(lm_model)

@@ -148,16 +148,28 @@ Traits$Statut.de.protection[Traits$Nom.latin == 'Turdus merula']
 Pour finir, la moitié des espèces figurant dans le top 3 des 4 années sont sous protection, et l'autre moitié ne l'est pas. 
 Notons que la France est le pays de l'UE qui chasse le plus grand nombre d'espèces d'oiseaux, dont un total de 20 espèces qui sont de plus, menacées de disparition. (source : https://www.lpo.fr/decouvrir-la-nature/conseils-biodiversite/conseils-biodiversite/juridique/oiseaux-menaces-et-chasses-en-france#:~:text=La%20Directive%20Oiseaux%2C%20dont%20la,membres%20de%20l'Union%20Européenne)
 
-## Graphe "Nombre d'oiseaux par température"
+## Graphe du nombre d'espèces par température
 ```{r}
-donnees_agregate <- aggregate(Nom_Latin ~ Temperature, data = Oiseaux, FUN = function(x) length(unique(x)))
+donnees_temp <- aggregate(Nom_Latin ~ Temperature, data = Oiseaux, FUN = function(x) length(unique(x)))
 
-plot(donnees_agregate$Temperature, donnees_agregate$Nom_Latin, type = "b", 
-     xlab = "Température (°C)", ylab = "Nombre d'oiseaux",
+plot(donnees_temp$Temperature, donnees_temp$Nom_Latin, type = "b", 
+     xlab = "Température (°C)", ylab = "Nombre d'espèces",
      main = "Nombre d'espèces par température",
      col = "blue", pch = 19)
 ```
 Nous remarquons que, pour un nombre maximal d'espèces présentes, la température optimale enregistrée est entre 5°C et 15°C avec un pic d'environ 80 espèces d'oiseaux différentes pour 10°C. Il y a cependant une chute d'espèces différentes lorsque la température se situe entre 0°C et 5°C avec bien moins de 50 espèces différentes. Lorsque la température enregistrée est de 20°C, bien qu'il y ait moins d'espèces différentes, il y en a tout de même environ 50 différentes, ce qui reste assez diversifié. 
+
+## Graphe du nombre d'espèces par intensité du vent
+```{r}
+donnees_vent <- aggregate(Nom_Latin ~ Vent, data = Oiseaux, FUN = function(x) length(unique(x)))
+donnees_vent$Vent_num <- as.numeric(gsub(" .*", "", donnees_vent$Vent))
+
+plot(donnees_vent$Vent_num, donnees_vent$Nom_Latin, type = "b", 
+     xlab = "Intensité du vent", ylab = "Nombre d'espèces",
+     main = "Nombre d'espèces par intensité du vent",
+     col = "blue", pch = 19)
+```
+Notons que 0 correspond à "Calme", 1 correspond à "Très légère brise", 2 à "Légère brise" et 3 à "Petite brise", on remarque que plus l'intensité du vent augmente, moins il y a d'espèces d'oiseaux différentes, même s'il s'agit en réalité d'une légère baisse : environ 80 espèces enregistrées lors d'une "Très légère brise" contre environ 60 espèces enregistrées lors d'une "Petite brise".
 
 ## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par température et par année
 ```{r}

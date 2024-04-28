@@ -31,6 +31,7 @@ library(leaflet.minicharts)
 library(ggplot2)
 library(FactoMineR)
 library(tidyr)
+library(gridExtra)
 ```
 
 ```{r setup, include=FALSE}
@@ -821,7 +822,19 @@ proportion <- function(data, year) {
 }
 ```
 
-## Formule 2
+## Indice D1
+```{r}
+D1 <- function(data, year) {
+  data <- data[data$Year == year,]
+  data <- data[data$Denombrement_min != 0,]
+  s_j <- aggregate(Nom_Latin ~ Code_Maille, data = data, FUN = function(x) length(unique(x)))
+  Sj <- data.frame(Code_Maille = s_j$Code_Maille,
+                            S = s_j$Nom_Latin)
+  return(Sj)
+}
+```
+
+## Indice D2
 H_j = entropie (somme par site)
 ```{r}
 exp_shannon <- function(proportions) {
@@ -838,7 +851,7 @@ exp_shannon <- function(proportions) {
 }
 ```
 
-## Formule 3
+## Indice D3
 
 1 divisé par la proba que deux individus qu'on prend dans un ehcantillon soient de la meme espece, donc plus la proba augmente, plus D_3 va diminuer car la proba est au dénominateur
 
@@ -865,10 +878,12 @@ x <- c(0, 1, 1, 2, 5)
 y <- c(2021, 2021, 2021, 2021, 2021)
 fictif <- data.frame(Denombrement_min = x, Code_Maille = c('2','2','2','4','4'), Nom_Latin = c('a','b','c','d','e'), Year = y)
 proportions_fictif <- proportion(fictif, 2021)
+D_1_fictif <- D1(fictif, 2021)
 D_2_fictif <- exp_shannon(proportions_fictif)
 D_3_fictif <- proba_simpson(proportions_fictif)
 
 proportions_fictif
+D_1_fictif
 D_2_fictif
 D_3_fictif
 ```
@@ -876,9 +891,11 @@ D_3_fictif
 ### Test sur tous les oiseaux
 ```{r}
 proportions_oiseaux <- proportion(Oiseaux, 2018)
+D_1_oiseaux <- D1(Oiseaux, 2018)
 D_2_oiseaux <- exp_shannon(proportions_oiseaux)
 D_3_oiseaux <- proba_simpson(proportions_oiseaux)
 proportions_oiseaux
+D_1_oiseaux
 D_2_oiseaux
 D_3_oiseaux
 ```
@@ -887,9 +904,11 @@ D_3_oiseaux
 ```{r}
 especes_choisies <- as.data.frame(Oiseaux[Oiseaux$Nom_Latin %in% c('Erithacus rubecula', 'Passer domesticus'), ])
 proportions_ER <- proportion(especes_choisies, 2022)
+D_1_ER <- D1(especes_choisies, 2022)
 D_2_ER <- exp_shannon(proportions_ER)
 D_3_ER <- proba_simpson(proportions_ER)
 proportions_ER
+D_1_ER
 D_2_ER
 D_3_ER
 ```

@@ -1362,7 +1362,7 @@ Cependant, la variable Régime.alimentaire seule n'a pas un effet significatif s
 En résumé, les résultats suggèrent que Milieu_favori et l'interaction entre Milieu_favori et Régime.alimentaire ont un impact significatif sur MOS11, tandis que Régime.alimentaire seul n'a pas un effet significatif.
 
 
-MODELE LINAIRE
+MODELE LINEAIRE
 ```{r}
 lm_model <- lm(MOS11 ~ Milieu_favori * Régime.alimentaire, data = donnees_agregate2)
 summary(lm_model)

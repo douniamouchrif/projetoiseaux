@@ -895,9 +895,9 @@ D_1_oiseaux <- D1(Oiseaux, 2018)
 D_2_oiseaux <- exp_shannon(proportions_oiseaux)
 D_3_oiseaux <- proba_simpson(proportions_oiseaux)
 proportions_oiseaux
-D_1_oiseaux
-D_2_oiseaux
-D_3_oiseaux
+D_1_oiseaux %>% arrange(desc(S))
+D_2_oiseaux %>% arrange(desc(D_2))
+D_3_oiseaux %>% arrange(desc(D_3))
 ```
 
 ### Test sur une espèce d'oiseaux
@@ -908,9 +908,9 @@ D_1_ER <- D1(especes_choisies, 2022)
 D_2_ER <- exp_shannon(proportions_ER)
 D_3_ER <- proba_simpson(proportions_ER)
 proportions_ER
-D_1_ER
-D_2_ER
-D_3_ER
+D_1_ER %>% arrange(desc(S))
+D_2_ER %>% arrange(desc(D_2))
+D_3_ER %>% arrange(desc(D_3))
 ```
 
 Pour les graphes suivants, nous choisissons de représenter nos valeurs seulement en fonction des sites présents sur toutes les années.

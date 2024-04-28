@@ -45,7 +45,7 @@ Traits <- read.csv("Data/traits-statut-IUCN-biodivercite.csv", header = TRUE, se
 ```
 
 ```{r}
-Sites
+head(Sites)
 ```
 
 ```{r}
@@ -54,15 +54,15 @@ nrow(Land_cartoISea)
 Pour chaque point on a 5 tailles de buffer --> 53x5
 
 ```{r}
-Land_cartoISea
+head(Land_cartoISea)
 ```
 
 ```{r}
-Oiseaux
+head(Oiseaux)
 ```
 
 ```{r}
-Traits
+head(Traits)
 ```
 
 ```{r}
@@ -182,7 +182,7 @@ amp_artificial <- amp_artificial %>% addLegend(position = "bottomright", pal = p
 amp_artificial
 ```
 
-On peut déjà voir une corrélation au niveau de l'artificialisation. Les lieux situés dans le centre ville de Bordeaux et des villes aux alentours ont tendances à avoir un pourcentage d'artificialisation supérieur (environ 60%) par rapport à ceux en périphérie de la ville (environ 10%).
+On peut déjà voir une corrélation au niveau de l'artificialisation. Les lieux situés dans le centre ville de Bordeaux et des villes aux alentours ont tendance à avoir un pourcentage d'artificialisation supérieur (environ 60%) par rapport à ceux en périphérie de la ville (environ 10%).
 
 ```{r}
 ###on join les df Land_cartoISea_500 et Oiseaux 
@@ -297,7 +297,7 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2019)")
 ```
-Changement dasn les températures qui a impacté l'observations des oiseaux -> plus chaud plus tôt donc des oiseaux qui avaient migré n'étaient pas encore revenus et inversement.
+Changement dans les températures qui a impacté l'observations des oiseaux -> plus chaud plus tôt donc des oiseaux qui avaient migré n'étaient pas encore revenus et inversement.
 Pic de prédation -> peu probable.
 En 2019 la courbe est très différente de celle de 2018. En effet, à 15°C on observe une chute du nombre d'espèces qui pourrait être causé par un événement spécifique à cette période de l'année. Cela pourrait inclure des phénomènes météorologiques extrêmes, des perturbations humaines, ou des événements écologiques particuliers (comme par exemple un pic de prédation). Nous allons comparer les autres données météorologiques que nous possédons pour comparer ce résultat avec ceux des autres années.
 

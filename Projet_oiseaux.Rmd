@@ -21,7 +21,7 @@ title: "Projet oiseaux"
 output: html_document
 date: "2024-02-19"
 ---
-# Imports
+# Imports nécessaires pour le fonctionnement de notre projet
 ```{r}
 library(dplyr)
 library(sp)
@@ -32,13 +32,14 @@ library(ggplot2)
 library(FactoMineR)
 library(tidyr)
 library(gridExtra)
+library(patchwork)
 ```
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Données
+# Présentation des données
 ```{r}
 Sites <- read.csv("Data/BiodiverCite_sites.csv", header = TRUE, sep = ";")
 Land_cartoISea <- read.csv("Data/LandUsePer_BM_2023_cartoISea.csv", header = TRUE)
@@ -83,9 +84,7 @@ years <- c(2018, 2019, 2022, 2023)
 ```
 
 
-# Statistiques descriptives
-
-## Top 3 des espèces d'oiseaux la plus présente selon l'année
+# Statistiques descriptives pour prendre connaissance des données
 
 ```{r}
 top3_species <- Oiseaux %>%
@@ -105,7 +104,6 @@ ggplot(top3_species, aes(x = factor(Year), y = Total, fill = Nom_Latin)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   facet_wrap(~Year, scales = "free_x")
 ```
-On remarque que l'espèce d'oiseaux la plus présente sur les années 2018 et 2019 est le "Sturnus Vulgaris", et la plus présente sur les années 2022 et 2023 est le "Passer Domesticus". Observons de plus près leurs traits spécifiques, ainsi qu'aux autres espèces figurant dans les top 3 de ces 4 années.
 
 ```{r}
 Traits$Milieu_favori[Traits$Nom.latin == 'Columba palumbus']
@@ -115,7 +113,6 @@ Traits$Milieu_favori[Traits$Nom.latin == 'Sturnus vulgaris']
 Traits$Milieu_favori[Traits$Nom.latin == 'Sylvia atricapilla']
 Traits$Milieu_favori[Traits$Nom.latin == 'Turdus merula']
 ```
-On voit que, parmis les espèces d'oiseaux figurant dans le top 3 de chaque année, chaque espèce possède comme milieu favori un milieu "généraliste" à part l'espèce "Passer domesticus" dont son milieu favori est le milieu du "bâti".
 
 ```{r}
 Traits$Régime.alimentaire[Traits$Nom.latin == 'Columba palumbus']
@@ -125,7 +122,6 @@ Traits$Régime.alimentaire[Traits$Nom.latin == 'Sturnus vulgaris']
 Traits$Régime.alimentaire[Traits$Nom.latin == 'Sylvia atricapilla']
 Traits$Régime.alimentaire[Traits$Nom.latin == 'Turdus merula']
 ```
-Concernant le régime alimentaire de ces espèces, il varie entre un régime mixte, végétarien et carnivore pour l'espèce "Parus major" figurant top 2 en 2019.
 
 ```{r}
 Traits$Nidification[Traits$Nom.latin == 'Columba palumbus']
@@ -135,7 +131,6 @@ Traits$Nidification[Traits$Nom.latin == 'Sturnus vulgaris']
 Traits$Nidification[Traits$Nom.latin == 'Sylvia atricapilla']
 Traits$Nidification[Traits$Nom.latin == 'Turdus merula']
 ```
-Du côté de la nidification, celle ci varie entre "cavité", "buisson", et "arbre" pour l'espèce "Columba palumbus". Notons que les espèces figurant top 1 sur les 4 années, à savoir l'espèce "Passer domesticus" et l'espèce "Sturnus vulgaris", ont tous deux le même lieu de nidification : "cavité".
 
 ```{r}
 Traits$Statut.de.protection[Traits$Nom.latin == 'Columba palumbus']
@@ -145,33 +140,26 @@ Traits$Statut.de.protection[Traits$Nom.latin == 'Sturnus vulgaris']
 Traits$Statut.de.protection[Traits$Nom.latin == 'Sylvia atricapilla']
 Traits$Statut.de.protection[Traits$Nom.latin == 'Turdus merula']
 ```
-Pour finir, la moitié des espèces figurant dans le top 3 des 4 années sont sous protection, et l'autre moitié ne l'est pas. 
-Notons que la France est le pays de l'UE qui chasse le plus grand nombre d'espèces d'oiseaux, dont un total de 20 espèces qui sont de plus, menacées de disparition. (source : https://www.lpo.fr/decouvrir-la-nature/conseils-biodiversite/conseils-biodiversite/juridique/oiseaux-menaces-et-chasses-en-france#:~:text=La%20Directive%20Oiseaux%2C%20dont%20la,membres%20de%20l'Union%20Européenne)
-
-## Graphe du nombre d'espèces par température
 ```{r}
 donnees_temp <- aggregate(Nom_Latin ~ Temperature, data = Oiseaux, FUN = function(x) length(unique(x)))
 
 plot(donnees_temp$Temperature, donnees_temp$Nom_Latin, type = "b", 
      xlab = "Température (°C)", ylab = "Nombre d'espèces",
-     main = "Nombre d'espèces par température",
+     main = "Nombre d'espèces en fonction de la température",
      col = "blue", pch = 19)
 ```
-Nous remarquons que, pour un nombre maximal d'espèces présentes, la température optimale enregistrée est entre 5°C et 15°C avec un pic d'environ 80 espèces d'oiseaux différentes pour 10°C. Il y a cependant une chute d'espèces différentes lorsque la température se situe entre 0°C et 5°C avec bien moins de 50 espèces différentes. Lorsque la température enregistrée est de 20°C, bien qu'il y ait moins d'espèces différentes, il y en a tout de même environ 50 différentes, ce qui reste assez diversifié. 
 
-## Graphe du nombre d'espèces par intensité du vent
 ```{r}
 donnees_vent <- aggregate(Nom_Latin ~ Vent, data = Oiseaux, FUN = function(x) length(unique(x)))
 donnees_vent$Vent_num <- as.numeric(gsub(" .*", "", donnees_vent$Vent))
 
 plot(donnees_vent$Vent_num, donnees_vent$Nom_Latin, type = "b", 
      xlab = "Intensité du vent", ylab = "Nombre d'espèces",
-     main = "Nombre d'espèces par intensité du vent",
+     main = "Nombre d'espèces en fonction de l'intensité du vent",
      col = "blue", pch = 19)
 ```
-Notons que 0 correspond à "Calme", 1 correspond à "Très légère brise", 2 à "Légère brise" et 3 à "Petite brise", on remarque que plus l'intensité du vent augmente, moins il y a d'espèces d'oiseaux différentes, même s'il s'agit en réalité d'une légère baisse : environ 80 espèces enregistrées lors d'une "Très légère brise" contre environ 60 espèces enregistrées lors d'une "Petite brise".
 
-## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par température et par année
+## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente en fonction de la température et par année
 ```{r}
 temp_species <- function(year) {
   temp_data <- Oiseaux %>%
@@ -192,11 +180,7 @@ temp_species <- function(year) {
 plot_1 <- lapply(years, temp_species)
 grid.arrange(grobs = plot_1, ncol = 2)
 ```
-Remarquons qu'une espèce est présente dans chaque année : le "Sturnus vulgaris" (= étourneau sansonnet). Elle est le plus présente en 2018 pour les températures 5°C, 10°C et 15°C, en 2019 pour 5°C et 20°C, en 2022 pour 0°C et en 2023 pour 15°C. Cela peut s'expliquer par le fait que cette espèce possède une partie sédentaire et une autre partie, celle par exemple nord-européenne, réalise une migration annuelle lors de l'automne en direction du Sud.
-
-L'autre espèce assez présente au cours des années est le "Passer domesticus" (= moineau domestique) en 2019 pour 0°C, en 2022 pour 5°C, 10°C, 15°C et 20°C et en 2023 pour 5°C, 10°C et 20°C. Cela peut s'expliquer par le fait que c'est un des rares oiseaux à être présent tout le long de l'année en grand nombre car il s'agit d'un oiseau sédentaire donc les migrations sont assez limitées.
-
-## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par intensité du vent
+## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente en fonction de l'intensité du vent
 ```{r}
 vent_species <- function(year) {
   vent_data <- Oiseaux %>%
@@ -218,9 +202,7 @@ vent_species <- function(year) {
 plot_2 <- lapply(years, vent_species)
 grid.arrange(grobs = plot_2, ncol = 2)
 ```
-Nous retrouvons ici les 2 espèces qui occupent nos histogrammes en grande partie, en notant le fait que le "Passer domesticus" est le plus présent quelque soit l'intensité du vent en 2022, et en très grande partie en 2023 aux côtés du "Sturnus vulgaris", qui lui aussi occupe une très grande partie en 2018.
-
-## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente par couverture nuageuse
+## Histogramme du nombre d'oiseaux dont l'espèce est la plus présente en fonction de la couverture nuageuse
 ```{r}
 nuage_species <- function(year) {
   nuage_data <- Oiseaux %>%
@@ -242,11 +224,6 @@ nuage_species <- function(year) {
 plot_3 <- lapply(years, nuage_species)
 grid.arrange(grobs = plot_3, ncol = 2)
 ```
-Sans grande surprise, nous retrouvons une nouvelle fois nos histogrammes occupés en majeure partie par le "Sturnus vulgaris" et le "Passer domesticus" en ayant à la fois presque le même type de répartition selon la couverture nuageuse que l'intensité du vent.
-
-Cela n'est finalement pas étonnant de retrouver ces deux espèces très présentes lors de ces années et en fonction des températures, de l'intensité du vent et de la couverture nuageuse étant les deux espèces figurant top 1 sur les 4 années.
-
-## Boxplots
 ```{r}
 boxplot_oiseaux <- Oiseaux %>%
   group_by(Year, Nom_Latin) %>%
@@ -260,12 +237,9 @@ ggplot(boxplot_oiseaux, aes(x = factor(Year), y = Total_Birds)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-On remarque que la majeure partie des espèces au fil des années contient un nombre d'oiseaux entre 0 et 50 oiseaux par espèces. Cependant, quelques espèces comportent plus d'oiseaux que la majeure partie, allant jusqu'à 250 oiseaux par espèces enregistrés. Enfin, la médiane se trouve environ à la même valeur pour chaque année 2018, 2019, 2022 et 2023.
+# Quelle est la forme de la relation biodiversité vs imperméabilisation du sol?
 
-# 1ere question : 
-
-Nous commençons par nous intéresser au buffer de taille 500m ce qui nous donnera un diamètre de 1km par rapport à chaque point.
-
+## carte ...
 ```{r}
 lambert_data <- data.frame(X = Land_cartoISea$X, Y = Land_cartoISea$Y)
 coordinates(lambert_data) <- c("X", "Y")
@@ -294,6 +268,7 @@ table_jointe_tbl <- Sites %>%
 ```
 
 ```{r}
+# carte de Bordeaux Métropole avec les points (sites) colorés en fonction du pourcentage d'artificialisation pour un buffersize de 500m
 palette <- colorNumeric(palette = "magma",domain = table_jointe_tbl$MOS11,reverse=TRUE)
 
 amp_artificial <- leaflet(data = table_jointe_tbl) %>% 
@@ -305,10 +280,7 @@ amp_artificial <- amp_artificial %>% addLegend(position = "bottomright", pal = p
 amp_artificial
 ```
 
-On peut déjà voir une corrélation au niveau de l'artificialisation. Les lieux situés dans le centre ville de Bordeaux et des villes aux alentours ont tendance à avoir un pourcentage d'artificialisation supérieur (environ 60%) par rapport à ceux en périphérie de la ville (environ 10%).
-
 ```{r}
-###on join les df Land_cartoISea_500 et Oiseaux 
 data_join <- Oiseaux %>% left_join(y = Land_cartoISea_500, by = c("Code_Maille" = "ID"))
 
 res <- data_join %>%
@@ -322,13 +294,7 @@ ggplot(data = res, aes(x = MOS11, y = Nb_espece, color = Year)) +
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation")
 ```
-
-On peut ici observer la corrélation par point entre le nombre d'espèce et le pourcentage d'artificialisation, chaque point correspondant à une espèce. 
-
-Relation non linéaire en forme de cloche : La relation entre la biodiversité et l'imperméabilisation du sol peut suivre une courbe en forme de cloche, où la biodiversité est maximale à un certain niveau d'imperméabilisation du sol, puis diminue à mesure que l'imperméabilisation augmente davantage. Cela peut être dû à des seuils écologiques ou à des effets de perturbation qui sont plus prononcés à des niveaux intermédiaires d'imperméabilisation.
-
 ```{r}
-# Filtre des données pour ne garder que l'année 2018
 res_2018 <- res %>% filter(Year == 2018)
 ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
   geom_point(color = "blue") +
@@ -337,11 +303,7 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation \n(année 2018)")
 ```
-
-Le nombre d'espèce a l'air assez constant sur l'année 2018. En effet, on remarque un léger pic à 10% d'artificialisation qui se stabilise après entre 20 et 40% d'artificialisation avec quand même une légère baisse à partir de 30%.
-
 ```{r}
-# Filtre des données pour ne garder que l'année 2019
 res_2018 <- res %>% filter(Year == 2019)
 ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
   geom_point(color = "blue") +
@@ -350,11 +312,7 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation \n(année 2019)")
 ```
-
-On remarque ici aussi un pic au niveau des 10% d'artificialisation puis un résultat assez constant. Ce qui peut parraitre surprenant c'est qu'avec 0% d'artificialisation on avait environ 25 espèces alors qu'avec presque 30% d'artificialisation, on a environ 26 espèces.
-
 ```{r}
-# Filtre des données pour ne garder que l'année 2022
 res_2018 <- res %>% filter(Year == 2022)
 ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
   geom_point(color = "blue") +
@@ -363,11 +321,7 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation \n(année 2022)")
 ```
-
-En 2023, on observe une nouvelle fois un pic proche des 10% d'artificialisation et après une chute jusqu'au 60% d'artificialisation. Comment peut-on expliquer cette chute ?
-
 ```{r}
-# Filtre des données pour ne garder que l'année 2023
 res_2018 <- res %>% filter(Year == 2023)
 ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
   geom_point(color = "blue") +
@@ -376,15 +330,6 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation \n(année 2023)")
 ```
-
-On voit que les tendances changent, surtout en 2023 avec un nombre d'espèces qui semble d'augmenter avec le pourcentage d'artificialisation. On a toujours le pic au niveau des 10% et ensuite, au lieu d'avoir un nombre d'espèces qui diminue considérablement, on a une courbe qui se maintient plutôt bien. On remarque même que cette dernière semble monter vers la fin comparé à 2022. 
-
-On remarque que les tendances du nombre d'espèces changent mais nous ne savons pas vraiment comment l'expliquer pour l'instant, uniquement avec la variable MOS11. Nous pouvons à présent supposer qu'une autre variable explicative doit pouvoir nous aider à les comprendre. Nous allons donc maintenant nous intéresser aux variables ambiantes : la température, le vent et la couverture nuageuse pour essayer de comprendre les variations au sujet du nombre d'espèces. 
-
-Relation en U inversé : Dans certains écosystèmes, une relation en U inversé peut être observée, où la biodiversité diminue initialement avec l'imperméabilisation du sol, puis augmente à mesure que l'imperméabilisation atteint des niveaux extrêmes. Cela peut être dû à des processus de succession écologique, ou à des changements de l'environnement qui favorisent certaines espèces spécialisées.
-
-On commence par s'intéresser à la température. 
-
 ```{r}
 data_2018 <- data_join %>%
   filter(Year == 2018)
@@ -400,9 +345,6 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2018)")
 ```
-
-On remarque une forme de parabole. Autour des 10°C, c'est à cette dernière qu'on observe le plus grand nombre d'espèces d'oiseaux (environ 64 espèces différentes).
-
 ```{r}
 data_2019 <- data_join %>%
   filter(Year == 2019)
@@ -418,10 +360,6 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2019)")
 ```
-Changement dans les températures qui a impacté l'observations des oiseaux -> plus chaud plus tôt donc des oiseaux qui avaient migré n'étaient pas encore revenus et inversement.
-Pic de prédation -> peu probable.
-En 2019 la courbe est très différente de celle de 2018. En effet, à 15°C on observe une chute du nombre d'espèces qui pourrait être causé par un événement spécifique à cette période de l'année. Cela pourrait inclure des phénomènes météorologiques extrêmes, des perturbations humaines, ou des événements écologiques particuliers (comme par exemple un pic de prédation). Nous allons comparer les autres données météorologiques que nous possédons pour comparer ce résultat avec ceux des autres années.
-
 ```{r}
 data_2022 <- data_join %>%
   filter(Year == 2022)
@@ -437,9 +375,6 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2022)")
 ```
-
-On retrouve une forme de parabole qu'on observait déjà en 2018, cependant, on voit que le nombre d'espèces à 20°C est bien supérieur à celui de 2018. On retrouve un pic à 15°C qu'on avait perdu en 2019, ainsi qu'un nombre d'espèces à 10°C qui est légèrement plus faible qu'en 2018.
-
 ```{r}
 data_2023 <- data_join %>%
   filter(Year == 2023)
@@ -455,10 +390,6 @@ ggplot(data = res_temperature, aes(x = Temperature, y = Nb_espece, color = as.fa
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la température (année 2023)")
 ```
-Finalement en 2023, on a encore cette forme de parabole mais qui s'atténue. En effet, on a un pic à 10°C mais la descente est ensuite plus douce jusqu'à 20°C : on a donc plus d'espèces d'oiseaux différentes en 2023 qu'en 2018.
-
-Maintenant on regarde le niveau du vent.
-
 ```{r}
 # Convertir la colonne "Vent" en facteur
 data_join$Vent <- factor(data_join$Vent, levels = c("0 - Calme", "1 - Très légère brise", "2 - Légère brise", "3 - Petite brise"))
@@ -468,39 +399,30 @@ res_vent <- data_join %>%
   group_by(Vent) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
-# Créer le graphique
 ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Vent",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du niveau de vent")
 ```
-Ce graphique est difficile à interpréter, en effet, plus il y a de vent moins on entendra les oiseaux. 
-
-On remarque que le vent n'a pas un impact significatif dans l'évolution du nombre d'espèces d'oiseaux car ce dernier reste assez constant avec une légère baisse lorsque le vent se fait ressentir un peu plus.
-
-
 ```{r}
 res_vent <- data_join %>%
   filter(Year == 2018) %>%
   group_by(Vent) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
-# Créer le graphique
 ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Vent",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du niveau de vent (année 2018)")
 ```
-
 ```{r}
 res_vent <- data_join %>%
   filter(Year == 2019) %>%
   group_by(Vent) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
-# Créer le graphique
 ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Vent",
@@ -513,36 +435,24 @@ res_vent <- data_join %>%
   group_by(Vent) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
-# Créer le graphique
 ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Vent",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du niveau de vent (année 2022)")
 ```
-
 ```{r}
 res_vent <- data_join %>%
   filter(Year == 2023) %>%
   group_by(Vent) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
-# Créer le graphique
 ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Vent",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du niveau de vent (année 2023)")
 ```
-
-
-Dans Couvert Nuageux, comme dans la qualité du Vent, les valeurs sont à la fois numériques et du texte, on a changé pour avoir des groupes, ainsi : 
-- 1 : 0-25%
-- 2 : 25-50%
-- 3 : 50-75%
-- 4 : 75-100%
-- 5 : 100%
-- 6 : Aucun
 ```{r}
 niveaux <- c("0-25%", "25-50%", "50-75%", "75-100%", "100,00 %", "Aucun")
 valeurs_numeriques <- c(1, 2, 3, 4, 5, 6)
@@ -556,21 +466,18 @@ res_couverture_nuageuse <- data_join %>%
   group_by(Couvert_Nuageux_factor) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
-# Créer le graphique
 ggplot(data = res_couverture_nuageuse, aes(x = Couvert_Nuageux_factor, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Couverture Nuageuse",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la couverture nuageuse")
 ```
-
 ```{r}
 res_couverture_nuageuse_2018 <- data_join %>%
   filter(Year == 2018) %>%
   group_by(Couvert_Nuageux_factor) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
-# Créer le graphique
 ggplot(data = res_couverture_nuageuse_2018, aes(x = Couvert_Nuageux_factor, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Couverture Nuageuse",
@@ -583,7 +490,6 @@ res_couverture_nuageuse_2019 <- data_join %>%
   group_by(Couvert_Nuageux_factor) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
-# Créer le graphique
 ggplot(data = res_couverture_nuageuse_2019, aes(x = Couvert_Nuageux_factor, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Couverture Nuageuse",
@@ -596,7 +502,6 @@ res_couverture_nuageuse_2022 <- data_join %>%
   group_by(Couvert_Nuageux_factor) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
-# Créer le graphique
 ggplot(data = res_couverture_nuageuse_2022, aes(x = Couvert_Nuageux_factor, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Couverture Nuageuse",
@@ -609,21 +514,18 @@ res_couverture_nuageuse_2023 <- data_join %>%
   group_by(Couvert_Nuageux_factor) %>%
   summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
-# Créer le graphique
 ggplot(data = res_couverture_nuageuse_2023, aes(x = Couvert_Nuageux_factor, y = Nb_espece)) +
   geom_bar(stat = "identity", fill = "pink") +
   labs(x = "Couverture Nuageuse",
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la couverture nuageuse (année 2023)")
 ```
-On fait maintenant une ACP, pour essayer de voir si la variabilité du nombre d'espèces est expliquée par l'artificialisation ou si elle peut être expliquée par d'autres variables ambiantes.
-
 ```{r}
 data_join$Vent_nombre <- as.numeric(gsub("\\D", "", data_join$Vent))
 data_join
 ```
-
 ```{r}
+# ACP des variables explicatives et nb_espece
 variables <- data_join %>%
   select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
   na.omit()
@@ -638,6 +540,7 @@ acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
 ```{r}
+#ACP de MOS11 et nb_espece
 variables <- data_join %>%
   select(MOS11, Nom_Latin) %>%
   na.omit()
@@ -651,20 +554,8 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-
-
-- Axes d'inertie : Le graphique montre deux dimensions principales. La première dimension (Dim 1) explique 27,96% de la variance tandis que la deuxième dimension (Dim 2) en explique 23,34%. Ensemble, ces deux dimensions expliquent un peu plus de la moitié de la variance totale.
-- Corrélation des variables avec les axes :
-Le vent semble être fortement corrélé avec la deuxième dimension et, dans une moindre mesure, avec la première dimension.
-Les variables "Couvert_Nuageux_factor" et "Température" sont alignées de manière similaire.
-La variable "MOS1" est fortement corrélée avec la première dimension et peu corrélée avec la deuxième dimension.
-- Interprétation :
-La température est une variable importante pour expliquer le nombre d'espèces d'oiseaux.
-Les variables "Vent_nombre" et "Couvert_Nuageux_factor" semblent être des facteurs importants qui ont une relation négative avec le nombre d'espèces d'oiseaux. Cela signifie que des conditions plus venteuses ou plus nuageuses pourraient être associées à une diminution du nombre d'espèces observées.
-La variable MOS11 est négativement corrélée avec Nb_espece, cela signique que quand le MOS11 augmente, le nombre d'espèces quand à lui diminue ce qui semble être cohérent.
-Le fait que "Nb_espece" ne soit pas fortement corrélé avec l'un ou l'autre des axes principaux suggère que d'autres facteurs non inclus dans cette analyse pourraient également jouer un rôle important (comme un pic de prédation).
-
 ```{r}
+#ACP des variables explicatives et nb_espece en 2018
 variables <- data_join %>%
   filter(Year == 2018) %>%
   select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
@@ -682,8 +573,8 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-## 2018 
 ```{r}
+#ACP de MOS11 et nb_espece en 2018
 variables <- data_join %>%
   filter(Year == 2018) %>%
   select(MOS11, Nom_Latin) %>%
@@ -698,8 +589,8 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-## 2019
 ```{r}
+#ACP des variables explicatives et nb_espece en 2019
 variables <- data_join %>%
   filter(Year == 2019) %>%
   select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
@@ -716,6 +607,7 @@ summary(acp)
 ```
 
 ```{r}
+#ACP de MOS11 et nb_espece en 2019
 variables <- data_join %>%
   filter(Year == 2019) %>%
   select(MOS11, Nom_Latin) %>%
@@ -731,10 +623,8 @@ acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
 
-En 2019, on retrouve des résultats surprenants, comme pour le nombre d'espèces en fonction de l'artificialisation. En effet, sur ce cercle de corrélation, on peux interpréter la chose suivante : le nombre d'espèces augmente avec l'artificialisation. Cependant, nous avions déjà des résultats surprenants avant, et la variable MOS11 étant mal projetée, on en déduit donc qu'elle n'est pas interprétable dans ce cas précis.
-
-## 2022
 ```{r}
+#ACP des variables explicatives et nb_espece en 2022
 variables <- data_join %>%
   filter(Year == 2022) %>%
   select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
@@ -751,6 +641,7 @@ summary(acp)
 ```
 
 ```{r}
+#ACP de MOS11 et nb_espece en 2022
 variables <- data_join %>%
   filter(Year == 2022) %>%
   select(MOS11, Nom_Latin) %>%
@@ -765,8 +656,9 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-## 2023
+
 ```{r}
+#ACP des variables explicatives et nb_espece en 2023
 variables <- data_join %>%
   filter(Year == 2023) %>%
   select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
@@ -783,6 +675,7 @@ summary(acp)
 ```
 
 ```{r}
+#ACP de MOS11 et nb_espece en 2023
 variables <- data_join %>%
   filter(Year == 2023) %>%
   select(MOS11, Nom_Latin) %>%
@@ -797,11 +690,8 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-
-2023 est certainement l'année qui explique le mieux notre problème initial. En effet, on remarque que le premier axe est très corrélé avec les variables ambiantes. De plus, les variables MOS11 et Nb_espece sont extrèmement corrélées négativement, avec un coefficient proche de -1. Cela signifie que quand l'aritficialisation augmente, le nombre d'espèces diminue, avec une relation quasiment linéaire.
-
-## Pour 2000m de rayon donc 4000m de diamètre
 ```{r}
+# carte de Bordeaux Métropole avec les points (sites) colorés en fonction du pourcentage d'artificialisation pour un buffersize de 2000m
 colnames(countryPolygons.df)[colnames(countryPolygons.df) == "coords.x1"] <- "X"
 colnames(countryPolygons.df)[colnames(countryPolygons.df) == "coords.x2"] <- "Y"
 Land_cartoISea <- select(Land_cartoISea, -X, -Y)
@@ -836,10 +726,7 @@ ggplot(data = res, aes(x = MOS11, y = Nb_espece, color = Year)) +
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation")
 ```
-
-On a quasiment les mêmes graphs que pour les ACP donc on en déduit les mêmes résultats pour toutes les tailles de buffer. 
-
-## Mais maintenant si on prend le BufferSize comme une donnée quelconque, est-ce que ce dernier à un impact sur le nombre d'espèces qu'on observe ?
+## Si on prend le BufferSize comme une donnée quelconque, est-ce que ce dernier à un impact sur le nombre d'espèces qu'on observe ?
 
 ```{r}
 data_join <- Oiseaux %>% left_join(y = Land_cartoISea, by = c("Code_Maille" = "ID"))
@@ -847,6 +734,7 @@ data_join
 ```
 
 ```{r}
+#ACP de MOS11, BufferSize et nb_espece
 variables <- data_join %>%
   select(MOS11, BufferSize, Nom_Latin) %>%
   na.omit()
@@ -860,6 +748,68 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
+
+# La biodiversité réagit-elle à d'autres catégories d’usage du sol ?
+
+```{r}
+## ACP sur les variables MOS et le nombre d’espèces d’oiseaux
+
+Land_cartoISea_500 <- Land_cartoISea %>%
+  filter(BufferSize == 500)
+
+data_join <- Oiseaux %>% 
+  left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID"))
+
+data_join <- data_join %>% 
+  left_join(Sites, by = c("Code_Maille" = "code_site"))
+
+data_aggregated <- data_join %>%
+  group_by(name_site) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+
+data_final <- left_join(data_join, data_aggregated, by = "name_site")
+
+data_acp <- data_final[, c("Nb_espece", paste0("MOS", 1:14))]
+
+data_acp_clean <- data_acp[, apply(data_acp, 2, function(x) !all(is.na(x)) & length(unique(x)) > 1)]
+
+variables_std <- scale(data_acp_clean)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+
+```{r}
+create_plot <- function(MOS, x_label) {
+  data_join <- Oiseaux %>% left_join(y = Land_cartoISea_500, by = c("Code_Maille" = "ID"))
+  res <- data_join %>%
+    group_by({{MOS}}, Year) %>%
+    summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
+  
+  ggplot(data = res, aes(x = {{MOS}}, y = Nb_espece, color = Year)) +
+    geom_point() +
+    geom_smooth(method = "auto", se = TRUE, color = "black") +
+    labs(x = x_label,
+         y = "Nb_especes")+
+    theme(legend.position = "none")
+}
+
+plot1 <- create_plot(MOS1, "MOS1 %")
+plot2 <- create_plot(MOS2, "MOS2 %")
+plot3 <- create_plot(MOS4, "MOS4 %")
+plot4 <- create_plot(MOS5, "MOS5 %")
+plot5 <- create_plot(MOS6, "MOS6 %")
+plot6 <- create_plot(MOS8, "MOS8 %")
+plot8 <- create_plot(MOS10, "MOS10 %")
+plot9 <- create_plot(MOS11, "MOS11 %")
+plot10 <- create_plot(MOS12, "MOS12 %")
+plot11 <- create_plot(MOS13, "MOS13 %")
+plot12 <- create_plot(MOS14, "MOS14 %")
+
+combined_plot <- plot1 + plot2 + plot3 + plot4 + plot5 + plot6 + plot8 + plot9 + plot10 + plot11 + plot12
+combined_plot
+```
+
+# Formules de diversité - indice de Shannon et indice de Simpson
 
 ```{r}
 # Nombre total pour chaque modalité Milieu_favori
@@ -875,12 +825,6 @@ tot_Milieu_favori
 Oiseaux_Tot <- sum(Oiseaux$Denombrement_min)
 ```
 
-# Formules de diversité
-
-i <- espece
-j <- site
-
-## Formule 1
 ```{r}
 proportion <- function(data, year) {
   data <- data[data$Year == year,]
@@ -897,7 +841,6 @@ proportion <- function(data, year) {
 }
 ```
 
-## Indice D1
 ```{r}
 D1 <- function(data, year) {
   data <- data[data$Year == year,]
@@ -909,8 +852,6 @@ D1 <- function(data, year) {
 }
 ```
 
-## Indice D2
-H_j = entropie (somme par site)
 ```{r}
 exp_shannon <- function(proportions) {
   H_j <- numeric(length(unique(proportions$Code_Maille)))
@@ -925,10 +866,6 @@ exp_shannon <- function(proportions) {
   return(D_2)
 }
 ```
-
-## Indice D3
-
-1 divisé par la proba que deux individus qu'on prend dans un ehcantillon soient de la meme espece, donc plus la proba augmente, plus D_3 va diminuer car la proba est au dénominateur
 
 ```{r}
 proba_simpson <- function(proportions) {
@@ -945,10 +882,8 @@ proba_simpson <- function(proportions) {
 }
 ```
 
-## Tests
-
-### Test fictif
 ```{r}
+# tests fictifs
 x <- c(0, 1, 1, 2, 5)
 y <- c(2021, 2021, 2021, 2021, 2021)
 fictif <- data.frame(Denombrement_min = x, Code_Maille = c('2','2','2','4','4'), Nom_Latin = c('a','b','c','d','e'), Year = y)
@@ -963,8 +898,8 @@ D_2_fictif
 D_3_fictif
 ```
 
-### Test sur tous les oiseaux
 ```{r}
+# Test sur tous les oiseaux
 proportions_oiseaux <- proportion(Oiseaux, 2018)
 D_1_oiseaux <- D1(Oiseaux, 2018)
 D_2_oiseaux <- exp_shannon(proportions_oiseaux)
@@ -975,8 +910,9 @@ D_2_oiseaux %>% arrange(desc(D_2))
 D_3_oiseaux %>% arrange(desc(D_3))
 ```
 
-### Test sur une espèce d'oiseaux
+
 ```{r}
+# Test sur une espèce d'oiseaux
 especes_choisies <- as.data.frame(Oiseaux[Oiseaux$Nom_Latin %in% c('Erithacus rubecula', 'Passer domesticus'), ])
 proportions_ER <- proportion(especes_choisies, 2022)
 D_1_ER <- D1(especes_choisies, 2022)
@@ -988,9 +924,6 @@ D_2_ER %>% arrange(desc(D_2))
 D_3_ER %>% arrange(desc(D_3))
 ```
 
-Pour les graphes suivants, nous choisissons de représenter nos valeurs seulement en fonction des sites présents sur toutes les années.
-
-## Graphe : Indice de Shannon
 ```{r}
 resultats_D_2_v1 <- list()
 for (annee in years) {
@@ -1013,7 +946,6 @@ ggplot(data = resultats_df_D_2, aes(x = Année, y = Moyenne_D_2)) +
        y = "Moyenne de D_2_oiseaux") +
   theme_minimal()
 ```
-On remarque que, entre 2018, 2019 et 2022, l'exponentielle de l'indice de Shannon diminue varie entre 20.20 et 20.75 en moyenne, ce qui est très léger. De 2022-2023, l'exponentielle de l'indice de Shannon diminue d'environ 1.0 en moyenne, ce qui reste aussi assez léger. Finalement, celui-ci reste assez constant au fil des années.
 
 ```{r}
 resultats_D_2_v2 <- list()
@@ -1064,7 +996,6 @@ ggplot(data = data_D2_join, aes(x = MOS11, y = D_2, color = Année)) +
        title = "Indice de diversité D2 en fonction du pourcentage d'artificialisation")
 ```
 
-## Graphe : Indice de Simpson
 ```{r}
 resultats_D_3_v1 <- list()
 for (annee in years) {
@@ -1087,7 +1018,6 @@ ggplot(data = resultats_df_D_3, aes(x = Année, y = Moyenne_D_3)) +
        y = "Moyenne de D_3_oiseaux") +
   theme_minimal()
 ```
-On remarque que, entre 2018 et 2019, l'indice de Simpson diminue d'environ 0.5, puis augmente d'environ 0.8 en 2022, ce qui reste des variations moyennes assez légères. De 2022 à 2023, l'indice de Simpson diminue d'environ 1.2 en moyenne, ce qui reste aussi assez léger. Finalement, l'indice de Simpson reste, lui aussi, assez constant au fil des années.
 
 ```{r}
 resultats_D_3_v2 <- list()
@@ -1128,8 +1058,6 @@ ggplot(data = D_3_annees_filtre, aes(x = D_3, fill = factor(Année))) +
   facet_wrap(~ Année)
 ```
 
-La distribution de l'indice de D3 (tous les sites qui revienent chque année). On peut le laisser et dire qu'on remarque que la distribution ne change pas au cours des années ou très très peu. 
-
 ```{r}
 data_D3_join <- D_3_annees_filtre %>% left_join(y = Land_cartoISea, by = c("Code_Maille" = "ID"))
 
@@ -1141,16 +1069,7 @@ ggplot(data = data_D3_join, aes(x = MOS11, y = D_3, color = Année)) +
        title = "Indice de diversité D3 en fonction du pourcentage d'artificialisation")
 ```
 
-Biodiversité -> diversité d'espèces
-Il faut se concentrer sur la diversité d'espèces et pas sur les nombres donc le dernier graph
-Corrélation par point entre le nombre d'espèce et le % d'artificialisation -> chaque point correspond à une espèce
-Le nombre d'oiseaux c'est pas de la biodiversité, c'est seulement le nombre d'oiseaux comptés -> la biodiversité c'est le nombre d'espèces
-Si on prend le comptage du nombre d'oiseaux, ce dernier augmente quand la surface artificialisée augmente. Il faudrait différencier les années pour les étudier une par une et voir pourquoi il y a des différences entre ces années ? % d'artificialisation ou température, vent, nuage (données ambiantes)
-Le faire année par année : 2018-2023 ça va changer ?? si ça change ca veut dire qu'on a une autre variable explicative on ira chercher les données ambiantes -> faire des comptages des températures en fonction des espèces
--> remplacer en abscisse la surface artificialisée par la température par exemple 
-Une ACP : essayer de voir si vraiment la variabilité du nombre d'espèces est expliqué par l'artificialisation ou si elle peut être expliquée par d'autres variables ambiantes.
-Calculer simpson pour les 4 années
-Richesse/shannon : nombre d'espèces présentes, calculer en fonction du mos/taille du buffer à 500 -> quelle est l'occupation du sol ou la diversité/richesse est la plus importante ? Normalement c'est dans les forêts qu'on aura une plus grande diversité comparée aux surfaces artificialisées. 
+# La forme de la relation est-elle similaire si on considère non plus l’imperméabilisation du sol mais plutôt la distance au centre ville, sachant que ces deux métriques sont corrélées? On pourra considérer Pey-Berland le centre ville et utiliser le package sf.
 
 ```{r}
 data_join_1 <- Oiseaux %>% 
@@ -1172,12 +1091,11 @@ ggplot(data = donnees_agregate2, aes(x = MOS11, y = Nom_Latin, color = Régime.a
   geom_smooth(method = "lm", se = FALSE, aes(group = Régime.alimentaire), linetype = "solid") +
   xlab("Surfaces artificialisées en % (MOS11)") +
   ylab("Nombre d'espèces d'oiseaux") + 
-  ggtitle("Diversité en fonction du nombre d'espèces d'oiseaux et le degré d'artificialisation") +
+  ggtitle("Diversité en fonction du nombre d'espèces d'oiseaux et le degré d'artificialisation en fonction du régime alimentaire") +
   scale_color_manual(name = "Régime.alimentaire", 
                      values = c("Carnivore" = "red", "Mixte" = "blue", "Végétarien" = "orange")) +
   theme_minimal()
 ```
-# Graphe "Diversité en fonction du nombre d'oiseaux et le degré d'artificialisation"
 ```{r}
 data_join_1 <- Oiseaux %>% 
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
@@ -1198,15 +1116,12 @@ ggplot(data = donnees_agregate2, aes(x = MOS11, y = Nom_Latin, color = Milieu_fa
   geom_smooth(method = "lm", se = FALSE, aes(group = Milieu_favori), linetype = "solid") +
   xlab("Surfaces artificialisées en % (MOS11)") +
   ylab("Nombre d'espèces d'oiseaux") + 
-  ggtitle("Diversité en fonction du nombre d'espèces d'oiseaux et le degré d'artificialisation") +
+  ggtitle("Diversité en fonction du nombre d'espèces d'oiseaux et le degré d'artificialisation en fonction du milieu favori") +
   scale_color_manual(name = "Milieu_favori", 
                      values = c("Agricole" = "red", "Forêt" = "blue", "Bâti" = "orange", "Généraliste" = "pink", "Zone humide" = "green")) +
   theme_minimal()
 ```
 
-La forme de la relation est-elle similaire si on considère non plus l’imperméabilisation du sol mais plutôt la distance au centre ville, sachant que ces deux métriques sont corrélées? On pourra considérer Pey-Berland le centre ville et utiliser le package sf.
-
-Nous avons pris comme point "centre-ville" le point "Bordeaux-A" car nous n'avons pas le point "Pey-Berland" dans nos données.
 ```{r}
 centres_villes <- Sites %>% 
                         left_join(y = Land_cartoISea_500, 
@@ -1240,8 +1155,8 @@ ggplot(data = donnees_agregate_distance, aes(x = distance_centre_ville, y = Nom_
   theme_minimal()
 ```
 
-## Carte points en fonction du nombre des oiseaux
 ```{r}
+# carte de Bordeaux Métropole avec les points (sites) colorés en fonction du nombre d'espèces pour un buffersize de 500m
 data_join_1 <- Oiseaux %>% 
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
 
@@ -1269,8 +1184,8 @@ amp_oiseaux <- amp_oiseaux %>% addLegend(position = "bottomright", pal = palette
 amp_oiseaux
 ```
 
-## Carte nombre et repartition des oiseaux en fonction de leur milieu favori
 ```{r}
+# carte de Bordeaux Métropole avec les sites representés par des piechart en fonction du mileu favori pour un buffersize de 500m de la repartiton des espèces d'oiseaux
 data_join_1 <- Oiseaux %>%
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
 
@@ -1324,8 +1239,8 @@ ma_carte <- ma_carte %>%
 ma_carte
 ```
 
-## Carte nombre et repartition des oiseaux en fonction de leur regime alimentaire
 ```{r}
+# Carte de Bordeaux Métropole du nombre et de la répartition des espèces d'oiseaux en fonction de leur régime alimentaire pour un buffersize de 500m
 data_join_1 <- Oiseaux %>%
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
 
@@ -1374,7 +1289,6 @@ ma_carte <- ma_carte %>%
 ma_carte
 ```
 
-## Histogramme Distribution de MOS11 par Milieu Favori et Régime Alimentaire
 ```{r}
 data_join_1 <- Oiseaux %>% 
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
@@ -1395,87 +1309,12 @@ ggplot(data = donnees_agregate2, aes(x = Milieu_favori, y = MOS11, fill = Régim
   labs(x = "Milieu Favori", y = "MOS11", fill = "Régime Alimentaire") +
   ggtitle("Distribution de MOS11 par Milieu Favori et Régime Alimentaire")
 ```
-
-## ANOVA
 ```{r}
 anova_model <- aov(MOS11 ~ Milieu_favori * Régime.alimentaire, data = donnees_agregate2)
 summary(anova_model)
 ```
 
-Les résultats de l'analyse de variance (ANOVA) indiquent que la variable MOS11 présente des différences significatives en fonction de Milieu_favori (p = 0.00370) et de l'interaction entre Milieu_favori et Régime.alimentaire (p = 0.00768). Cela signifie qu'il existe des variations significatives de MOS11 entre les différents niveaux de Milieu_favori et que cette relation est influencée par Régime.alimentaire.
-
-Cependant, la variable Régime.alimentaire seule n'a pas un effet significatif sur MOS11 (p = 0.74679).
-
-En résumé, les résultats suggèrent que Milieu_favori et l'interaction entre Milieu_favori et Régime.alimentaire ont un impact significatif sur MOS11, tandis que Régime.alimentaire seul n'a pas un effet significatif.
-
-
-## MODELE LINEAIRE
 ```{r}
 lm_model <- lm(MOS11 ~ Milieu_favori * Régime.alimentaire, data = donnees_agregate2)
 summary(lm_model)
 ```
-
-Dans l'ensemble, le modèle semble avoir une faible capacité prédictive, comme en témoigne le faible coefficient de détermination multiple ajusté (Adjusted R-squared) de 0.02455. Cela signifie que les variables incluses dans le modèle n'expliquent qu'une petite proportion de la variance de MOS11.
-
-
-## biodiversité et catégorie d'usage des sols
-
-```{r}
-## ACP sur les variables MOS et le nombre d’espèces d’oiseaux
-
-Land_cartoISea_500 <- Land_cartoISea %>%
-  filter(BufferSize == 500)
-
-data_join <- Oiseaux %>% 
-  left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID"))
-
-data_join <- data_join %>% 
-  left_join(Sites, by = c("Code_Maille" = "code_site"))
-
-data_aggregated <- data_join %>%
-  group_by(name_site) %>%
-  summarise(Nb_espece = n_distinct(Nom_Latin))
-
-data_final <- left_join(data_join, data_aggregated, by = "name_site")
-
-data_acp <- data_final[, c("Nb_espece", paste0("MOS", 1:14))]
-
-data_acp_clean <- data_acp[, apply(data_acp, 2, function(x) !all(is.na(x)) & length(unique(x)) > 1)]
-
-variables_std <- scale(data_acp_clean)
-acp <- PCA(variables_std, scale = TRUE)
-summary(acp)
-```
-
-```{r}
-library(patchwork)
-create_plot <- function(MOS, x_label) {
-  data_join <- Oiseaux %>% left_join(y = Land_cartoISea_500, by = c("Code_Maille" = "ID"))
-  res <- data_join %>%
-    group_by({{MOS}}, Year) %>%
-    summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
-  
-  ggplot(data = res, aes(x = {{MOS}}, y = Nb_espece, color = Year)) +
-    geom_point() +
-    geom_smooth(method = "auto", se = TRUE, color = "black") +
-    labs(x = x_label,
-         y = "Nb_especes")+
-    theme(legend.position = "none")
-}
-
-plot1 <- create_plot(MOS1, "MOS1 %")
-plot2 <- create_plot(MOS2, "MOS2 %")
-plot3 <- create_plot(MOS4, "MOS3 %")
-plot4 <- create_plot(MOS5, "MOS5 %")
-plot5 <- create_plot(MOS6, "MOS6 %")
-plot6 <- create_plot(MOS8, "MOS8 %")
-plot8 <- create_plot(MOS10, "MOS10 %")
-plot9 <- create_plot(MOS11, "MOS11 %")
-plot10 <- create_plot(MOS12, "MOS12 %")
-plot11 <- create_plot(MOS13, "MOS13 %")
-plot12 <- create_plot(MOS14, "MOS14 %")
-
-combined_plot <- plot1 + plot2 + plot3 + plot4 + plot5 + plot6 + plot8 + plot9 + plot10 + plot11 + plot12
-combined_plot
-```
-

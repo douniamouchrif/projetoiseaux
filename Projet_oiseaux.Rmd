@@ -1344,3 +1344,66 @@ summary(lm_model)
 ```
 
 Dans l'ensemble, le modèle semble avoir une faible capacité prédictive, comme en témoigne le faible coefficient de détermination multiple ajusté (Adjusted R-squared) de 0.02455. Cela signifie que les variables incluses dans le modèle n'expliquent qu'une petite proportion de la variance de MOS11.
+
+
+## biodiversité et catégorie d'usage des sols
+
+```{r}
+## ACP sur les variables MOS et le nombre d’espèces d’oiseaux
+
+Land_cartoISea_500 <- Land_cartoISea %>%
+  filter(BufferSize == 500)
+
+data_join <- Oiseaux %>% 
+  left_join(Land_cartoISea_500, by = c("Code_Maille" = "ID"))
+
+data_join <- data_join %>% 
+  left_join(Sites, by = c("Code_Maille" = "code_site"))
+
+data_aggregated <- data_join %>%
+  group_by(name_site) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin))
+
+data_final <- left_join(data_join, data_aggregated, by = "name_site")
+
+data_acp <- data_final[, c("Nb_espece", paste0("MOS", 1:14))]
+
+data_acp_clean <- data_acp[, apply(data_acp, 2, function(x) !all(is.na(x)) & length(unique(x)) > 1)]
+
+variables_std <- scale(data_acp_clean)
+acp <- PCA(variables_std, scale = TRUE)
+summary(acp)
+```
+
+```{r}
+library(patchwork)
+create_plot <- function(MOS, x_label) {
+  data_join <- Oiseaux %>% left_join(y = Land_cartoISea_500, by = c("Code_Maille" = "ID"))
+  res <- data_join %>%
+    group_by({{MOS}}, Year) %>%
+    summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
+  
+  ggplot(data = res, aes(x = {{MOS}}, y = Nb_espece, color = Year)) +
+    geom_point() +
+    geom_smooth(method = "auto", se = TRUE, color = "black") +
+    labs(x = x_label,
+         y = "Nb_especes")+
+    theme(legend.position = "none")
+}
+
+plot1 <- create_plot(MOS1, "MOS1 %")
+plot2 <- create_plot(MOS2, "MOS2 %")
+plot3 <- create_plot(MOS4, "MOS3 %")
+plot4 <- create_plot(MOS5, "MOS5 %")
+plot5 <- create_plot(MOS6, "MOS6 %")
+plot6 <- create_plot(MOS8, "MOS8 %")
+plot8 <- create_plot(MOS10, "MOS10 %")
+plot9 <- create_plot(MOS11, "MOS11 %")
+plot10 <- create_plot(MOS12, "MOS12 %")
+plot11 <- create_plot(MOS13, "MOS13 %")
+plot12 <- create_plot(MOS14, "MOS14 %")
+
+combined_plot <- plot1 + plot2 + plot3 + plot4 + plot5 + plot6 + plot8 + plot9 + plot10 + plot11 + plot12
+combined_plot
+```
+

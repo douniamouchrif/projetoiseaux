@@ -224,6 +224,7 @@ nuage_species <- function(year) {
 plot_3 <- lapply(years, nuage_species)
 grid.arrange(grobs = plot_3, ncol = 2)
 ```
+## Boxplot sur la distribution du nombre d'oiseaux par espèce au fil des années
 ```{r}
 boxplot_oiseaux <- Oiseaux %>%
   group_by(Year, Nom_Latin) %>%

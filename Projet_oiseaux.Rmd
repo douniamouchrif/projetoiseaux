@@ -529,6 +529,7 @@ ggplot(data = res_couverture_nuageuse_2023, aes(x = Couvert_Nuageux_factor, y = 
 data_join$Vent_nombre <- as.numeric(gsub("\\D", "", data_join$Vent))
 data_join
 ```
+# ACP
 ```{r}
 # ACP des variables explicatives et nb_espece
 variables <- data_join %>%
@@ -545,7 +546,7 @@ acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
 ```{r}
-#ACP de MOS11 et nb_espece
+# ACP de MOS11 et nb_espece
 variables <- data_join %>%
   select(MOS11, Nom_Latin) %>%
   na.omit()
@@ -560,7 +561,7 @@ acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
 ```{r}
-#ACP des variables explicatives et nb_espece en 2018
+# ACP des variables explicatives et nb_espece en 2018
 variables <- data_join %>%
   filter(Year == 2018) %>%
   select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
@@ -579,7 +580,7 @@ acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
 ```{r}
-#ACP de MOS11 et nb_espece en 2018
+# ACP de MOS11 et nb_espece en 2018
 variables <- data_join %>%
   filter(Year == 2018) %>%
   select(MOS11, Nom_Latin) %>%
@@ -595,7 +596,7 @@ acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
 ```{r}
-#ACP des variables explicatives et nb_espece en 2019
+# ACP des variables explicatives et nb_espece en 2019
 variables <- data_join %>%
   filter(Year == 2019) %>%
   select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
@@ -610,9 +611,8 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-
 ```{r}
-#ACP de MOS11 et nb_espece en 2019
+# ACP de MOS11 et nb_espece en 2019
 variables <- data_join %>%
   filter(Year == 2019) %>%
   select(MOS11, Nom_Latin) %>%
@@ -627,9 +627,8 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-
 ```{r}
-#ACP des variables explicatives et nb_espece en 2022
+# ACP des variables explicatives et nb_espece en 2022
 variables <- data_join %>%
   filter(Year == 2022) %>%
   select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
@@ -644,9 +643,8 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-
 ```{r}
-#ACP de MOS11 et nb_espece en 2022
+# ACP de MOS11 et nb_espece en 2022
 variables <- data_join %>%
   filter(Year == 2022) %>%
   select(MOS11, Nom_Latin) %>%
@@ -661,9 +659,8 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-
 ```{r}
-#ACP des variables explicatives et nb_espece en 2023
+# ACP des variables explicatives et nb_espece en 2023
 variables <- data_join %>%
   filter(Year == 2023) %>%
   select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
@@ -678,9 +675,8 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-
 ```{r}
-#ACP de MOS11 et nb_espece en 2023
+# ACP de MOS11 et nb_espece en 2023
 variables <- data_join %>%
   filter(Year == 2023) %>%
   select(MOS11, Nom_Latin) %>%
@@ -696,7 +692,7 @@ acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
 ```{r}
-# carte de Bordeaux Métropole avec les points (sites) colorés en fonction du pourcentage d'artificialisation pour un buffersize de 2000m
+# Carte de Bordeaux Métropole avec les points (sites) colorés en fonction du pourcentage d'artificialisation pour un buffersize de 2000m
 colnames(countryPolygons.df)[colnames(countryPolygons.df) == "coords.x1"] <- "X"
 colnames(countryPolygons.df)[colnames(countryPolygons.df) == "coords.x2"] <- "Y"
 Land_cartoISea <- select(Land_cartoISea, -X, -Y)
@@ -716,7 +712,6 @@ amp_artificial <- amp_artificial %>% addLegend(position = "bottomright", pal = p
 
 amp_artificial
 ```
-
 ```{r}
 data_join <- Oiseaux %>% left_join(y = Land_cartoISea_2000, by = c("Code_Maille" = "ID"))
 
@@ -739,7 +734,7 @@ data_join
 ```
 
 ```{r}
-#ACP de MOS11, BufferSize et nb_espece
+# ACP de MOS11, BufferSize et nb_espece
 variables <- data_join %>%
   select(MOS11, BufferSize, Nom_Latin) %>%
   na.omit()
@@ -887,8 +882,9 @@ proba_simpson <- function(proportions) {
 }
 ```
 
+## Tests des indices de Shannon et de Simpson
 ```{r}
-# tests fictifs
+# Tests fictifs
 x <- c(0, 1, 1, 2, 5)
 y <- c(2021, 2021, 2021, 2021, 2021)
 fictif <- data.frame(Denombrement_min = x, Code_Maille = c('2','2','2','4','4'), Nom_Latin = c('a','b','c','d','e'), Year = y)
@@ -904,7 +900,7 @@ D_3_fictif
 ```
 
 ```{r}
-# Test sur tous les oiseaux
+# Tests sur tous les oiseaux
 proportions_oiseaux <- proportion(Oiseaux, 2018)
 D_1_oiseaux <- D1(Oiseaux, 2018)
 D_2_oiseaux <- exp_shannon(proportions_oiseaux)
@@ -917,7 +913,7 @@ D_3_oiseaux %>% arrange(desc(D_3))
 
 
 ```{r}
-# Test sur une espèce d'oiseaux
+# Tests sur une espèce d'oiseaux
 especes_choisies <- as.data.frame(Oiseaux[Oiseaux$Nom_Latin %in% c('Erithacus rubecula', 'Passer domesticus'), ])
 proportions_ER <- proportion(especes_choisies, 2022)
 D_1_ER <- D1(especes_choisies, 2022)
@@ -928,7 +924,7 @@ D_1_ER %>% arrange(desc(S))
 D_2_ER %>% arrange(desc(D_2))
 D_3_ER %>% arrange(desc(D_3))
 ```
-
+## Représentations des indices de Shannon et de Simpson
 ```{r}
 resultats_D_2_v1 <- list()
 for (annee in years) {
@@ -1161,7 +1157,7 @@ ggplot(data = donnees_agregate_distance, aes(x = distance_centre_ville, y = Nom_
 ```
 
 ```{r}
-# carte de Bordeaux Métropole avec les points (sites) colorés en fonction du nombre d'espèces pour un buffersize de 500m
+# Carte de Bordeaux Métropole avec les points (sites) colorés en fonction du nombre d'espèces pour un buffersize de 500m
 data_join_1 <- Oiseaux %>% 
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
 
@@ -1190,7 +1186,7 @@ amp_oiseaux
 ```
 
 ```{r}
-# carte de Bordeaux Métropole avec les sites representés par des piechart en fonction du mileu favori pour un buffersize de 500m de la repartiton des espèces d'oiseaux
+# Carte de Bordeaux Métropole avec les sites representés par des piechart en fonction du mileu favori pour un buffersize de 500m de la repartiton des espèces d'oiseaux
 data_join_1 <- Oiseaux %>%
   left_join(Traits, by = c("Nom_Latin" = "Nom.latin"))
 

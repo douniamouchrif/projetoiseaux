@@ -53,7 +53,6 @@ head(Sites)
 ```{r}
 nrow(Land_cartoISea)
 ```
-Pour chaque point on a 5 tailles de buffer --> 53x5
 
 ```{r}
 head(Land_cartoISea)
@@ -352,7 +351,7 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation \n(année 2019)")
 ```
 
-On remarque ici aussi un pic au niveau des 10% d'artificialisation puis un résultat assez constant. Ce qui peut parraitre surprenant c'est qu'avec 0% d'artificialisation on avait environ 25 espèces alors qu'avec presque 30% d'artificialisation, on a environ 26 espèces. Le nombre d'espèces observées augmente avec l'artificialisation ??
+On remarque ici aussi un pic au niveau des 10% d'artificialisation puis un résultat assez constant. Ce qui peut parraitre surprenant c'est qu'avec 0% d'artificialisation on avait environ 25 espèces alors qu'avec presque 30% d'artificialisation, on a environ 26 espèces.
 
 ```{r}
 # Filtre des données pour ne garder que l'année 2022
@@ -365,7 +364,6 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation \n(année 2022)")
 ```
 
-ATTENTION À L'INTERPRÉTATION CAR LES ECHELLES NE SONT PAS LES MÊMES SUR L'AXE DES ABSCISSES
 En 2023, on observe une nouvelle fois un pic proche des 10% d'artificialisation et après une chute jusqu'au 60% d'artificialisation. Comment peut-on expliquer cette chute ?
 
 ```{r}
@@ -379,10 +377,9 @@ ggplot(data = res_2018, aes(x = MOS11, y = Nb_espece)) +
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation \n(année 2023)")
 ```
 
-ATTENTION À L'INTERPRÉTATION CAR LES ECHELLES NE SONT PAS LES MÊMES SUR L'AXE DES ABSCISSES
-On voit que les tendances changent, surtout en 2023 avec un nombre d'espèces qui semble d'augmenter avec le pourcentage d'artificialisation. On a toujours le pic au niveau des 10% et ensuite, au lieu d'avoir un nombre d'espèces qui diminue considérablement, on a une courbe qui se maintient plutôt bien. On remarque même que cette dernière semble monter vers la fin, que peut-on en déduire ??
+On voit que les tendances changent, surtout en 2023 avec un nombre d'espèces qui semble d'augmenter avec le pourcentage d'artificialisation. On a toujours le pic au niveau des 10% et ensuite, au lieu d'avoir un nombre d'espèces qui diminue considérablement, on a une courbe qui se maintient plutôt bien. On remarque même que cette dernière semble monter vers la fin comparé à 2022. 
 
-On remarque que les tendances du nombre d'espèces changent mais nous ne savons pas vraiment comment l'expliquer. Nous pouvons à présent supposer qu'une autre variable explicative doit pouvoir nous aider à les comprendre. Nous allons donc maintenant nous intéresser aux variables ambiantes :  la température, le vent et la couverture nuageuse pour essayer de comprendre les variations au sujet du nombre d'espèces. 
+On remarque que les tendances du nombre d'espèces changent mais nous ne savons pas vraiment comment l'expliquer pour l'instant, uniquement avec la variable MOS11. Nous pouvons à présent supposer qu'une autre variable explicative doit pouvoir nous aider à les comprendre. Nous allons donc maintenant nous intéresser aux variables ambiantes : la température, le vent et la couverture nuageuse pour essayer de comprendre les variations au sujet du nombre d'espèces. 
 
 Relation en U inversé : Dans certains écosystèmes, une relation en U inversé peut être observée, où la biodiversité diminue initialement avec l'imperméabilisation du sol, puis augmente à mesure que l'imperméabilisation atteint des niveaux extrêmes. Cela peut être dû à des processus de succession écologique, ou à des changements de l'environnement qui favorisent certaines espèces spécialisées.
 
@@ -478,11 +475,10 @@ ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du niveau de vent")
 ```
-Difficile à interpréter parce que le niveau de vent aura un impact sur si on entend les oiseaux ou pas --> plus y'a de vent, moins on entend les oiseaux.
+Ce graphique est difficile à interpréter, en effet, plus il y a de vent moins on entendra les oiseaux. 
 
 On remarque que le vent n'a pas un impact significatif dans l'évolution du nombre d'espèces d'oiseaux car ce dernier reste assez constant avec une légère baisse lorsque le vent se fait ressentir un peu plus.
 
-Je sais pas si ça sert a quelque chose d'analyser pour chaque année sachant que quand on fait sur toutes les années y'a pas grand chose à interpréter. Je mets le code pour une année et on aura juste à la changer pour tout avoir. 
 
 ```{r}
 res_vent <- data_join %>%
@@ -498,6 +494,48 @@ ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
        title = "Nombre d'espèces différentes en fonction du niveau de vent (année 2018)")
 ```
 
+```{r}
+res_vent <- data_join %>%
+  filter(Year == 2019) %>%
+  group_by(Vent) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
+
+# Créer le graphique
+ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
+  geom_bar(stat = "identity", fill = "pink") +
+  labs(x = "Vent",
+       y = "Nombre d'espèces",
+       title = "Nombre d'espèces différentes en fonction du niveau de vent (année 2019)")
+```
+```{r}
+res_vent <- data_join %>%
+  filter(Year == 2022) %>%
+  group_by(Vent) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
+
+# Créer le graphique
+ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
+  geom_bar(stat = "identity", fill = "pink") +
+  labs(x = "Vent",
+       y = "Nombre d'espèces",
+       title = "Nombre d'espèces différentes en fonction du niveau de vent (année 2022)")
+```
+
+```{r}
+res_vent <- data_join %>%
+  filter(Year == 2023) %>%
+  group_by(Vent) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
+
+# Créer le graphique
+ggplot(data = res_vent, aes(x = Vent, y = Nb_espece)) +
+  geom_bar(stat = "identity", fill = "pink") +
+  labs(x = "Vent",
+       y = "Nombre d'espèces",
+       title = "Nombre d'espèces différentes en fonction du niveau de vent (année 2023)")
+```
+
+
 Dans Couvert Nuageux, comme dans la qualité du Vent, les valeurs sont à la fois numériques et du texte, on a changé pour avoir des groupes, ainsi : 
 - 1 : 0-25%
 - 2 : 25-50%
@@ -512,8 +550,6 @@ data_join$Couvert_Nuageux_factor <- factor(data_join$Couvert_Nuageux, levels = n
 data_join$Couvert_Nuageux_factor <- valeurs_numeriques[match(data_join$Couvert_Nuageux_factor, niveaux)]
 ```
 
-Et finalement la couverture nuageuse.
-
 ```{r}
 # Créer un résumé du nombre d'espèces par niveau de couverture nuageuse
 res_couverture_nuageuse <- data_join %>%
@@ -527,10 +563,8 @@ ggplot(data = res_couverture_nuageuse, aes(x = Couvert_Nuageux_factor, y = Nb_es
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la couverture nuageuse")
 ```
-Pareil pour la couverture nuageuse, je mets seulement 2018 et on aura juste à changer l'année pour avoir les autres
 
 ```{r}
-# Créer un résumé du nombre d'espèces par niveau de couverture nuageuse
 res_couverture_nuageuse_2018 <- data_join %>%
   filter(Year == 2018) %>%
   group_by(Couvert_Nuageux_factor) %>%
@@ -543,7 +577,45 @@ ggplot(data = res_couverture_nuageuse_2018, aes(x = Couvert_Nuageux_factor, y = 
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction de la couverture nuageuse (année 2018)")
 ```
+```{r}
+res_couverture_nuageuse_2019 <- data_join %>%
+  filter(Year == 2019) %>%
+  group_by(Couvert_Nuageux_factor) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
 
+# Créer le graphique
+ggplot(data = res_couverture_nuageuse_2019, aes(x = Couvert_Nuageux_factor, y = Nb_espece)) +
+  geom_bar(stat = "identity", fill = "pink") +
+  labs(x = "Couverture Nuageuse",
+       y = "Nombre d'espèces",
+       title = "Nombre d'espèces différentes en fonction de la couverture nuageuse (année 2019)")
+```
+```{r}
+res_couverture_nuageuse_2022 <- data_join %>%
+  filter(Year == 2022) %>%
+  group_by(Couvert_Nuageux_factor) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
+
+# Créer le graphique
+ggplot(data = res_couverture_nuageuse_2022, aes(x = Couvert_Nuageux_factor, y = Nb_espece)) +
+  geom_bar(stat = "identity", fill = "pink") +
+  labs(x = "Couverture Nuageuse",
+       y = "Nombre d'espèces",
+       title = "Nombre d'espèces différentes en fonction de la couverture nuageuse (année 2022)")
+```
+```{r}
+res_couverture_nuageuse_2023 <- data_join %>%
+  filter(Year == 2023) %>%
+  group_by(Couvert_Nuageux_factor) %>%
+  summarise(Nb_espece = n_distinct(Nom_Latin), .groups = 'drop')
+
+# Créer le graphique
+ggplot(data = res_couverture_nuageuse_2023, aes(x = Couvert_Nuageux_factor, y = Nb_espece)) +
+  geom_bar(stat = "identity", fill = "pink") +
+  labs(x = "Couverture Nuageuse",
+       y = "Nombre d'espèces",
+       title = "Nombre d'espèces différentes en fonction de la couverture nuageuse (année 2023)")
+```
 On fait maintenant une ACP, pour essayer de voir si la variabilité du nombre d'espèces est expliquée par l'artificialisation ou si elle peut être expliquée par d'autres variables ambiantes.
 
 ```{r}
@@ -610,7 +682,7 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
-
+## 2018 
 ```{r}
 variables <- data_join %>%
   filter(Year == 2018) %>%
@@ -626,10 +698,11 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
+## 2019
 ```{r}
 variables <- data_join %>%
   filter(Year == 2019) %>%
-  select(MOS11, Nom_Latin) %>%
+  select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
   na.omit()
 data_aggregated <- variables %>%
   group_by(MOS11) %>%
@@ -645,7 +718,7 @@ summary(acp)
 ```{r}
 variables <- data_join %>%
   filter(Year == 2019) %>%
-  select(MOS11, Temperature, Couvert_Nuageux_factor, Vent_nombre, Nom_Latin) %>%
+  select(MOS11, Nom_Latin) %>%
   na.omit()
 data_aggregated <- variables %>%
   group_by(MOS11) %>%
@@ -660,6 +733,7 @@ summary(acp)
 
 En 2019, on retrouve des résultats surprenants, comme pour le nombre d'espèces en fonction de l'artificialisation. En effet, sur ce cercle de corrélation, on peux interpréter la chose suivante : le nombre d'espèces augmente avec l'artificialisation. Cependant, nous avions déjà des résultats surprenants avant, et la variable MOS11 étant mal projetée, on en déduit donc qu'elle n'est pas interprétable dans ce cas précis.
 
+## 2022
 ```{r}
 variables <- data_join %>%
   filter(Year == 2022) %>%
@@ -675,6 +749,7 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
+
 ```{r}
 variables <- data_join %>%
   filter(Year == 2022) %>%
@@ -690,6 +765,7 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
+## 2023
 ```{r}
 variables <- data_join %>%
   filter(Year == 2023) %>%
@@ -705,6 +781,7 @@ variables_std <- scale(variables)
 acp <- PCA(variables_std, scale = TRUE)
 summary(acp)
 ```
+
 ```{r}
 variables <- data_join %>%
   filter(Year == 2023) %>%
@@ -759,8 +836,6 @@ ggplot(data = res, aes(x = MOS11, y = Nb_espece, color = Year)) +
        y = "Nombre d'espèces",
        title = "Nombre d'espèces différentes en fonction du pourcentage d'artificialisation")
 ```
-
-
 
 On a quasiment les mêmes graphs que pour les ACP donc on en déduit les mêmes résultats pour toutes les tailles de buffer. 
 
@@ -1128,9 +1203,6 @@ ggplot(data = donnees_agregate2, aes(x = MOS11, y = Nom_Latin, color = Milieu_fa
                      values = c("Agricole" = "red", "Forêt" = "blue", "Bâti" = "orange", "Généraliste" = "pink", "Zone humide" = "green")) +
   theme_minimal()
 ```
-
-
-# 2eme question
 
 La forme de la relation est-elle similaire si on considère non plus l’imperméabilisation du sol mais plutôt la distance au centre ville, sachant que ces deux métriques sont corrélées? On pourra considérer Pey-Berland le centre ville et utiliser le package sf.
 
